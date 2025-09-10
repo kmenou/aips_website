@@ -41,6 +41,15 @@
         margin: 0 auto;
       }
 
+      /* Page title: centered */
+      .page-title {
+        text-align: center;
+        margin: 1.25rem 0 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        font-size: 1.5rem;
+      }
+
       /* meta lines for each publication (the short title/date line) */
       .pub-meta {
         margin: 0.75rem 0 0.25rem;
@@ -49,27 +58,24 @@
       }
 
       /* Abstract styling: slightly smaller text, readable line length, left/right thin borders,
-         inner padding so text doesn't touch borders, responsive on small screens. */
+         inner padding so text doesn't touch borders, responsive on small screens.
+         Increased width by 25% (70ch -> 87.5ch). */
       .pub-list .abstract {
         font-size: 0.95rem;           /* slightly smaller than default body text */
         line-height: 1.55;
         color: #222;
-        max-width: 70ch;              /* keeps lines a readable length */
+        max-width: 87.5ch;            /* 70ch * 1.25 = 87.5ch (25% wider) */
         margin: 0.25rem auto 1.25rem; /* centers block and separates from other elements */
         padding: 0.6rem 1rem;         /* space between text and borders */
         border-left: 2px solid rgba(0,0,0,0.08);
         border-right: 2px solid rgba(0,0,0,0.08);
         border-radius: 6px;
         background: rgba(255,255,255,0.98); /* subtle background to separate from page */
-        box-shadow: none;
         box-sizing: border-box;
         word-wrap: break-word;
       }
 
-      /* if you want the abstracts noticeably smaller, change to 0.9rem or 0.85rem */
-      /* You can also use clamp() for fluid scaling: font-size: clamp(0.85rem, 1.2vw, 0.98rem); */
-
-      /* make sure on narrow screens the abstract uses available width with some gutters */
+      /* mobile: keep responsive gutters and reduce border width */
       @media (max-width: 600px) {
         .pub-list .abstract {
           max-width: calc(100% - 2rem);
@@ -77,8 +83,10 @@
           padding-right: 0.8rem;
           border-left-width: 1px;
           border-right-width: 1px;
+          font-size: 0.92rem;
         }
         .pub-meta { font-size: 0.98rem; }
+        .page-title { font-size: 1.25rem; }
       }
 
       /* Optional: reduce the large left &nbsp; look by cleaning up paragraph indentation */
@@ -125,7 +133,7 @@
   </script>
 
   <main class="content">
-    <h2 style="margin-left:0.5rem;">Publications</h2>
+    <h2 class="page-title">Publications</h2>
 
     <section class="pub-list">
 
