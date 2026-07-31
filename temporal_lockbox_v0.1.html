@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>The temporal lockbox: a hardened observatory for AI misalignment</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<style>
+
+:root{
+  --paper:#FAFAF7;
+  --ink:#1C232B;
+  --ink-soft:#535E68;
+  --accent:#1D5A6E;
+  --accent-deep:#123B4A;
+  --signal:#A93F2E;
+  --rule:#DCE0DD;
+  --band:#E7EFF0;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --display:"Newsreader",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--serif);
+  font-size:1.075rem;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{color:var(--accent-deep)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:1px}
+.wrap{max-width:44rem;margin:0 auto;padding:0 1.35rem}
+
+/* ---------- header ---------- */
+header{position:relative;overflow:hidden;border-bottom:1px solid var(--rule)}
+.isobars{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.head-inner{position:relative;padding:4.5rem 0 2.6rem}
+.eyebrow{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:1.4rem;
+}
+h1{
+  font-family:var(--display);font-weight:500;
+  font-size:3.05rem;
+  line-height:1.13;letter-spacing:-.012em;max-width:38rem;
+}
+.standfirst{
+  font-family:var(--display);font-style:italic;font-weight:400;
+  font-size:1.28rem;line-height:1.5;
+  color:var(--ink-soft);max-width:36rem;margin-top:1.15rem;
+}
+.byline{
+  font-family:var(--mono);font-size:.76rem;color:var(--ink-soft);
+  margin-top:1.7rem;letter-spacing:.03em;
+}
+.byline b{color:var(--ink);font-weight:500}
+.hashstrip{
+  font-family:var(--mono);font-size:.68rem;color:var(--ink-soft);
+  margin-top:.65rem;letter-spacing:.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+  opacity:.75;
+}
+.hashstrip span{color:var(--accent)}
+
+/* ---------- article ---------- */
+article{padding:2.4rem 0 1rem}
+h2{
+  font-family:var(--display);font-weight:600;
+  font-size:1.5rem;line-height:1.25;letter-spacing:-.008em;
+  margin:3rem 0 1rem;
+}
+h2::before{
+  content:"";display:block;width:2.1rem;height:2px;
+  background:var(--accent);margin-bottom:.85rem;
+}
+h3{
+  font-family:var(--display);font-weight:600;font-size:1.12rem;
+  margin:2rem 0 .6rem;
+}
+p{margin:0 0 1.15rem}
+p+p{text-indent:0}
+em{font-style:italic}
+strong{font-weight:600}
+.smallcaps{font-variant:small-caps;letter-spacing:.03em}
+
+.epistemic{
+  background:var(--band);border-left:3px solid var(--accent);
+  padding:1.05rem 1.2rem;margin:0 0 2.2rem;
+  font-size:.93rem;line-height:1.62;color:var(--ink);
+}
+.epistemic .lbl{
+  display:block;font-family:var(--mono);font-size:.7rem;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--accent-deep);
+  margin-bottom:.5rem;
+}
+
+.pull{
+  font-family:var(--display);font-style:italic;font-weight:400;
+  font-size:1.32rem;line-height:1.45;color:var(--accent-deep);
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  padding:1.3rem .2rem;margin:2.2rem 0;
+}
+
+/* ---------- figures ---------- */
+figure{margin:2.4rem 0}
+figure svg{width:100%;height:auto;display:block}
+figcaption{
+  font-family:var(--mono);font-size:.76rem;line-height:1.6;
+  color:var(--ink-soft);border-top:1px solid var(--rule);
+  padding-top:.6rem;margin-top:.45rem;
+}
+figcaption b{color:var(--accent);font-weight:500}
+
+/* ---------- table ---------- */
+.tblwrap{overflow-x:auto;margin:2.2rem 0 .4rem}
+table{
+  border-collapse:collapse;width:100%;
+  font-family:var(--mono);font-size:.75rem;line-height:1.45;
+}
+th{
+  text-align:left;font-weight:500;letter-spacing:.05em;text-transform:uppercase;
+  font-size:.66rem;color:var(--ink-soft);
+  border-bottom:1.5px solid var(--ink);padding:.5rem .55rem .45rem;
+}
+td{border-bottom:1px solid var(--rule);padding:.52rem .55rem;vertical-align:top}
+td:first-child{font-weight:500}
+tr.hero td{background:var(--band)}
+.y{color:var(--accent);font-weight:500}
+.n{color:var(--ink-soft)}
+.m{color:var(--signal)}
+.legend{
+  font-family:var(--mono);font-size:.72rem;color:var(--ink-soft);
+  margin:0 0 2rem;
+}
+
+ol.qs{margin:0 0 1.15rem 1.3rem}
+ol.qs li{margin-bottom:.7rem;padding-left:.25rem}
+
+footer{
+  border-top:1px solid var(--rule);margin-top:3rem;
+  padding:1.6rem 0 3.2rem;
+  font-family:var(--mono);font-size:.76rem;line-height:1.7;color:var(--ink-soft);
+}
+footer b{color:var(--ink);font-weight:500}
+
+@media screen and (max-width:600px){
+  h1{font-size:2.15rem}
+  .standfirst{font-size:1.1rem}
+  h1.part{font-size:1.65rem}
+}
+
+@media print{
+  header{border-bottom:1px solid #000}
+  a{color:inherit;text-decoration:none}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+ul{margin:0 0 1.15rem 1.25rem;padding:0}
+ul li{margin-bottom:.5rem;padding-left:.2rem}
+h3{font-family:var(--display);font-weight:600;font-size:1.08rem;margin:1.9rem 0 .55rem;color:var(--accent-deep)}
+mark{background:#FBF3D0;padding:0 .1em;border-radius:2px}
+table td:first-child{font-weight:500;color:var(--ink)}
+figure svg{background:transparent}
+
+h1.part{
+  font-family:var(--display);font-weight:600;
+  font-size:2rem;line-height:1.2;letter-spacing:-.01em;
+  color:var(--accent-deep);margin:4.2rem 0 1.6rem;padding-top:1.5rem;
+  border-top:2px solid var(--accent);
+}
+h1.part+h2{margin-top:1.4rem}
+.version{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;
+  color:var(--accent);margin-top:.55rem;text-transform:uppercase;
+}
+
+
+/* ---------- streamlined revision ---------- */
+article > p{max-width:42rem}
+.refs{margin-left:1.45rem}
+.refs li{margin-bottom:.72rem;padding-left:.2rem}
+table{font-size:.73rem}
+thead{display:table-header-group}
+caption{caption-side:top;text-align:left;font-family:var(--mono);font-size:.7rem;color:var(--ink-soft);padding-bottom:.5rem}
+
+@page{size:Letter;margin:.72in .72in .7in}
+@media print{
+  body{font-size:10.35pt;line-height:1.48;background:#fff}
+  .wrap{max-width:none;padding:0}
+  .head-inner{padding:1.35in 0 .55in}
+  article{padding:.35in 0 0}
+  h1.part{break-before:page;page-break-before:always}
+  h2,h3{break-after:avoid;page-break-after:avoid}
+  p,li{orphans:3;widows:3}
+  figure,.tblwrap{break-inside:avoid;page-break-inside:avoid}
+  table{font-size:7.7pt;line-height:1.25}
+  th,td{padding:.32rem .38rem}
+}
+
+caption{font-weight:500;color:var(--accent-deep);padding:.35rem 0 .55rem;}
+</style>
+</head>
+<body>
+<header>
+<svg aria-hidden="true" class="isobars" preserveaspectratio="xMidYMid slice" viewbox="0 0 1200 420">
+<g fill="none" stroke="#1D5A6E" stroke-width="1">
+<path d="M-50,330 C150,290 260,180 470,200 C660,218 700,330 940,300 C1090,281 1160,220 1260,235" opacity=".10"></path>
+<path d="M-50,270 C140,240 280,120 480,145 C640,165 720,270 930,245 C1080,227 1150,175 1260,185" opacity=".12"></path>
+<path d="M-50,215 C160,190 300,70 500,95 C640,113 740,215 930,192 C1070,175 1150,130 1260,140" opacity=".14"></path>
+<path d="M-50,160 C180,140 330,20 520,45 C650,62 760,160 940,140 C1070,125 1160,90 1260,95" opacity=".10"></path>
+<path d="M-50,105 C200,90 360,-30 540,-5 C660,12 780,105 950,88 C1080,76 1170,50 1260,52" opacity=".07"></path>
+</g>
+</svg>
+<div class="wrap head-inner">
+<div class="eyebrow">A thought experiment on AI evaluations, physics and misalignment</div>
+<h1>The temporal lockbox: a hardened observatory for AI misalignment</h1>
+<p class="standfirst">Weather forecasts by AI agents can be scored against measurements that do not yet exist and cannot plausibly be influenced by the forecaster. That causal gap enables harder-to-game AI evaluations under sustained optimization pressure - and an observatory for how agents act in various misaligned ways.</p>
+<p class="byline">Kristen Menou · Professor of Physics and Astrophysics, University of Toronto · kristen.menou@utoronto.ca</p>
+<p class="version">Version 0.1 · 30 July 2026</p>
+</div>
+</header>
+<article class="wrap">
+<h2 id="abstract">Abstract</h2>
+<p>Most AI evaluations can be gamed because their answers already exist somewhere within reach of the agent being tested. In a temporal-lockbox evaluation, the agent must predict an outcome before the ground truth even exists. Weather observations at physical stations are the strongest natural target. Once a forecast is committed, the atmosphere generates the outcome over the following days, and national weather services measure it independently. Weather has several other relevant properties: it is turbulent and sensitive to initial conditions; no reasonable actor can steer synoptic-scale conditions enough to modify the ground truth to their advantage; and state-of-the-art forecasts still leave room for genuine improvement.</p>
+<p>This essay explores the merits and limitations of the following two claims. First, weather can support an evaluation whose target cannot be memorized, retrieved, or strategically modified. Second, this causal protection narrows the remaining ways one can compromise the evaluation: interfere with a sensor, alter the data stream, exploit the scoring system, or influence the operators. The essay develops the physical argument, sketches a public registry and a hosted observatory for AI misalignment, then lists their unresolved engineering and governance problems.</p>
+<h2 id="road-map">Road map</h2>
+<p>The essay has two parts.</p>
+<p>Part I develops the causal argument. A future station observation is not a hidden answer waiting on a server; it is created in the future by the atmosphere and measured by independent networks. At synoptic scale, no plausible participant can influence those values. Weather therefore supplies fresh targets indefinitely, with enough remaining forecast headroom to reward genuine improvement.</p>
+<p>Part II treats the idea as a design exercise. It separates a public performance registry from a hosted behavioural observatory, then asks where each can still fail. The architecture, numerical examples, and all proposed thresholds are exploratory and provisional.</p>
+<h1 class="part" id="part-i-the-physical-argument">Part I · The physical argument</h1>
+<h2 id="why-ordinary-evaluations-can-be-gamed">Why ordinary evaluations can be gamed</h2>
+<p>Many decisions about frontier AI rely on evaluations: capability estimates, deployment gates, third-party tests, and policy. Their value depends on integrity. Yet most current evaluations share a basic weakness: the answer already exists somewhere at the time the agent acts.</p>
+<p>Markets and elections, among other societal events, are vulnerable prediction targets: the agent may change the event being predicted. Held-out sets are files protected by access control. Capture-the-flag answers may be objects inside the environment. Automated graders can be persuaded, and human graders can be influenced. In all these cases the target exists at action time and is protected by defence. Synoptic-scale weather is different. No participant can set a thousand-kilometre flow pattern days ahead; arbitrarily strong intelligence does not supply the missing energy or coordination. The relevant distinction is therefore not between careful and careless evaluation, but between a defended answer and an answer that does not yet exist and cannot be influenced.</p>
+
+<p>In a temporal-lockbox evaluation, the target does not exist when the forecast is committed. An external process generates it later, and no participant can influence the process at the resolution being scored. Physics protects the outcome; observation, software, and human systems remain ordinary points of failure. It is argued below that prospective weather at named stations is the strongest available instance.</p>
+<h2 id="why-weather-works">Why weather works</h2>
+<p>The atmosphere is a rotating, stratified fluid whose motion is turbulent and sensitive to initial conditions. At the scale of the highs, lows, and fronts that organize day-to-day weather, small initial differences grow roughly by a factor of two every two days. Because observations never specify the starting state perfectly, a small present uncertainty becomes a large future uncertainty. The scored target is not the fluid as a whole but a precise measurement: for example, temperature at a named station and hour, reported by a calibrated instrument.</p>
+<p>Predictability of a natural phenomenon is typically specified for a variable, scale, lead time, and tolerance. A thunderstorm, a station temperature, a 500-hPa pattern, and a seasonal index have different limits. For midlatitude weather, useful forecast skill is often said to fade after roughly 10-15 days, although theory and idealized experiments do not imply a universal two-week ceiling.[3-5] A narrower claim suffices here: exact future station values do not exist at commit time, and skill declines with lead time.</p>
+<p>Vonich and Hakim reported large-scale skill beyond 30 days after optimizing initial conditions through a machine-learning weather model against the trajectory that actually occurred.[6] Because the future trajectory enters the optimization, this is not an operational forecast. It is better read as a measure of predictive headroom: how much skill might be available with near-oracle knowledge of the initial state used for prediction.</p>
+<p>That headroom is expensive to reach. If small errors double about every two days, forecast range grows only logarithmically as the initial state improves: reducing the initial error tenfold adds roughly a week; reducing it a millionfold adds about a month. Extending the predictive range therefore requires substantially denser observations and better data assimilation.</p>
+<p>For an evaluation, this is a useful regime. At 1-10 day leads, the outcome is absent when the forecast is committed, yet forecast quality still varies enough to reward better models, observations, assimilation, and post-processing. The design does not require a hard predictability ceiling, but a conservatively calibrated tripwire for implausibly high skill could be implemented in principle.</p>
+
+<p>Three practical properties strengthen the case. First, weather is measured by a distributed international system of surface stations, radiosondes, aircraft, and satellites operating under shared standards.[11-13] Independent networks make cross-checks possible. They do not, however, make any database entry immutable, so a platform must commit in advance to the observation vintage, station list, quality flags, and rules for late or revised reports.</p>
+<p>Second, the large-scale atmosphere is extremely hard to steer. Cloud seeding can produce conditional local effects, and climate intervention could shift regional statistics, but neither lets a participant target a station-hour outcome after committing a forecast.[7-9] The defensible claim is narrower than “weather cannot be modified” but sufficient: no participant can plausibly move enough undisclosed station targets, in chosen directions and beyond the scoring tolerance, more cheaply than attacking the sensor, data, software, or human layers. Local interference around a given sensor is the important exception.</p>
+<p>Third, the task is accessible and unsolved. Data-driven weather models now compete with operational physics-based systems on many medium-range forecasts. Aardvark demonstrated an end-to-end system with station skill to ten days; Mosaic reports a 24-member ten-day forecast in under twelve seconds on one H100.[17-18] Pretrained models can therefore be run and modified on modest accelerator budgets. There is also room to improve: recent systems still underrepresent some record-breaking extremes.[19]</p>
+<figure>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 650" width="1240" height="650" font-family="'IBM Plex Mono','JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" role="img" aria-label="Forecast error growth versus lead time, with current practice, an estimated attainable envelope, a verification floor, sampling uncertainty, and a governed alarm threshold.">
+<defs>
+<pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="10" stroke="#B0432E" stroke-width="1" opacity="0.20"/>
+  </pattern>
+<marker id="axArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0 0.6 L9.4 5 L0 9.4 Z" fill="#16232B"/>
+  </marker>
+<marker id="dimArrow" viewBox="0 0 10 10" refX="8.6" refY="5" markerWidth="5.4" markerHeight="5.4" orient="auto-start-reverse">
+    <path d="M0 1 L8.8 5 L0 9 Z" fill="#16232B"/>
+  </marker>
+</defs>
+<rect width="1240" height="650" fill="#FAFAF7"/>
+<rect x="236.67" y="82" width="600.00" height="466.00" fill="#DBE8EE" opacity="0.62"/>
+<line x1="236.67" y1="82" x2="236.67" y2="548.0" stroke="#2A6E8F" stroke-width="1" opacity="0.28" stroke-dasharray="3 5"/>
+<line x1="836.67" y1="82" x2="836.67" y2="548.0" stroke="#2A6E8F" stroke-width="1" opacity="0.28" stroke-dasharray="3 5"/>
+<text x="536.67" y="107" text-anchor="middle" font-size="17.25" font-weight="700" letter-spacing="2.6" fill="#2A6E8F" opacity="0.92">1–10 DAY OPERATING WINDOW</text>
+<rect x="170.0" y="517.47" width="1000.0" height="30.53" fill="#EBE7DE"/>
+<line x1="170.0" y1="517.47" x2="1170.0" y2="517.47" stroke="#CFC9BC" stroke-width="1.2"/>
+<path d="M 170.00 511.96 L 173.12 511.55 L 176.25 511.14 L 179.38 510.72 L 182.50 510.30 L 185.62 509.87 L 188.75 509.43 L 191.88 508.99 L 195.00 508.54 L 198.12 508.09 L 201.25 507.63 L 204.38 507.16 L 207.50 506.69 L 210.62 506.21 L 213.75 505.72 L 216.88 505.23 L 220.00 504.73 L 223.12 504.23 L 226.25 503.72 L 229.38 503.20 L 232.50 502.67 L 235.62 502.14 L 238.75 501.60 L 241.88 501.06 L 245.00 500.50 L 248.12 499.94 L 251.25 499.37 L 254.38 498.80 L 257.50 498.22 L 260.62 497.63 L 263.75 497.03 L 266.88 496.42 L 270.00 495.81 L 273.12 495.19 L 276.25 494.56 L 279.38 493.92 L 282.50 493.28 L 285.62 492.63 L 288.75 491.97 L 291.88 491.30 L 295.00 490.62 L 298.12 489.94 L 301.25 489.24 L 304.38 488.54 L 307.50 487.83 L 310.62 487.11 L 313.75 486.38 L 316.88 485.64 L 320.00 484.90 L 323.12 484.14 L 326.25 483.38 L 329.38 482.61 L 332.50 481.82 L 335.62 481.03 L 338.75 480.23 L 341.88 479.42 L 345.00 478.61 L 348.12 477.78 L 351.25 476.94 L 354.38 476.09 L 357.50 475.24 L 360.62 474.37 L 363.75 473.49 L 366.88 472.61 L 370.00 471.71 L 373.12 470.81 L 376.25 469.89 L 379.38 468.97 L 382.50 468.03 L 385.62 467.09 L 388.75 466.13 L 391.88 465.17 L 395.00 464.19 L 398.12 463.20 L 401.25 462.21 L 404.38 461.20 L 407.50 460.19 L 410.62 459.16 L 413.75 458.12 L 416.88 457.07 L 420.00 456.01 L 423.12 454.95 L 426.25 453.87 L 429.38 452.78 L 432.50 451.68 L 435.62 450.57 L 438.75 449.44 L 441.88 448.31 L 445.00 447.17 L 448.12 446.02 L 451.25 444.85 L 454.38 443.68 L 457.50 442.49 L 460.62 441.30 L 463.75 440.09 L 466.88 438.87 L 470.00 437.65 L 473.12 436.41 L 476.25 435.16 L 479.38 433.90 L 482.50 432.63 L 485.62 431.35 L 488.75 430.06 L 491.88 428.76 L 495.00 427.45 L 498.12 426.13 L 501.25 424.80 L 504.38 423.45 L 507.50 422.10 L 510.62 420.74 L 513.75 419.37 L 516.88 417.98 L 520.00 416.59 L 523.12 415.19 L 526.25 413.77 L 529.38 412.35 L 532.50 410.92 L 535.62 409.48 L 538.75 408.03 L 541.88 406.56 L 545.00 405.09 L 548.12 403.61 L 551.25 402.12 L 554.38 400.63 L 557.50 399.12 L 560.62 397.60 L 563.75 396.08 L 566.88 394.54 L 570.00 393.00 L 573.12 391.45 L 576.25 389.89 L 579.38 388.33 L 582.50 386.75 L 585.62 385.17 L 588.75 383.57 L 591.88 381.98 L 595.00 380.37 L 598.12 378.76 L 601.25 377.13 L 604.38 375.51 L 607.50 373.87 L 610.62 372.23 L 613.75 370.58 L 616.88 368.92 L 620.00 367.26 L 623.12 365.59 L 626.25 363.92 L 629.38 362.24 L 632.50 360.56 L 635.62 358.86 L 638.75 357.17 L 641.88 355.47 L 645.00 353.76 L 648.12 352.05 L 651.25 350.33 L 654.38 348.61 L 657.50 346.89 L 660.62 345.16 L 663.75 343.43 L 666.88 341.70 L 670.00 339.96 L 673.12 338.22 L 676.25 336.47 L 679.38 334.72 L 682.50 332.97 L 685.62 331.22 L 688.75 329.47 L 691.88 327.71 L 695.00 325.95 L 698.12 324.19 L 701.25 322.43 L 704.38 320.67 L 707.50 318.91 L 710.62 317.14 L 713.75 315.38 L 716.88 313.62 L 720.00 311.85 L 723.12 310.09 L 726.25 308.33 L 729.38 306.56 L 732.50 304.80 L 735.62 303.04 L 738.75 301.28 L 741.88 299.52 L 745.00 297.77 L 748.12 296.01 L 751.25 294.26 L 754.38 292.51 L 757.50 290.77 L 760.62 289.02 L 763.75 287.28 L 766.88 285.54 L 770.00 283.81 L 773.12 282.08 L 776.25 280.35 L 779.38 278.62 L 782.50 276.91 L 785.62 275.19 L 788.75 273.48 L 791.88 271.78 L 795.00 270.07 L 798.12 268.38 L 801.25 266.69 L 804.38 265.00 L 807.50 263.33 L 810.62 261.65 L 813.75 259.99 L 816.88 258.32 L 820.00 256.67 L 823.12 255.02 L 826.25 253.38 L 829.38 251.75 L 832.50 250.12 L 835.62 248.50 L 838.75 246.89 L 841.88 245.28 L 845.00 243.68 L 848.12 242.09 L 851.25 240.51 L 854.38 238.93 L 857.50 237.37 L 860.62 235.81 L 863.75 234.26 L 866.88 232.72 L 870.00 231.19 L 873.12 229.66 L 876.25 228.15 L 879.38 226.64 L 882.50 225.15 L 885.62 223.66 L 888.75 222.18 L 891.88 220.71 L 895.00 219.25 L 898.12 217.80 L 901.25 216.36 L 904.38 214.93 L 907.50 213.51 L 910.62 212.10 L 913.75 210.69 L 916.88 209.30 L 920.00 207.92 L 923.12 206.55 L 926.25 205.19 L 929.38 203.84 L 932.50 202.50 L 935.62 201.16 L 938.75 199.84 L 941.88 198.53 L 945.00 197.23 L 948.12 195.95 L 951.25 194.67 L 954.38 193.40 L 957.50 192.14 L 960.62 190.89 L 963.75 189.66 L 966.88 188.43 L 970.00 187.22 L 973.12 186.01 L 976.25 184.82 L 979.38 183.63 L 982.50 182.46 L 985.62 181.30 L 988.75 180.15 L 991.88 179.01 L 995.00 177.87 L 998.12 176.75 L 1001.25 175.65 L 1004.38 174.55 L 1007.50 173.46 L 1010.62 172.38 L 1013.75 171.31 L 1016.88 170.26 L 1020.00 169.21 L 1023.12 168.17 L 1026.25 167.15 L 1029.38 166.13 L 1032.50 165.13 L 1035.62 164.13 L 1038.75 163.15 L 1041.88 162.17 L 1045.00 161.21 L 1048.12 160.26 L 1051.25 159.31 L 1054.38 158.38 L 1057.50 157.45 L 1060.62 156.54 L 1063.75 155.64 L 1066.88 154.74 L 1070.00 153.86 L 1073.12 152.98 L 1076.25 152.12 L 1079.38 151.26 L 1082.50 150.42 L 1085.62 149.58 L 1088.75 148.75 L 1091.88 147.94 L 1095.00 147.13 L 1098.12 146.33 L 1101.25 145.54 L 1104.38 144.76 L 1107.50 143.99 L 1110.62 143.23 L 1113.75 142.47 L 1116.88 141.73 L 1120.00 140.99 L 1123.12 140.26 L 1126.25 139.55 L 1129.38 138.84 L 1132.50 138.13 L 1135.62 137.44 L 1138.75 136.76 L 1141.88 136.08 L 1145.00 135.41 L 1148.12 134.75 L 1151.25 134.10 L 1154.38 133.46 L 1157.50 132.82 L 1160.62 132.20 L 1163.75 131.58 L 1166.88 130.96 L 1170.00 130.36 L 1170.00 517.47 L 170.00 517.47 Z" fill="url(#hatch)"/>
+<line x1="170.0" y1="124.00" x2="1170.0" y2="124.00" stroke="#16232B" stroke-width="1.6" stroke-dasharray="10 8" opacity="0.42"/>
+<text x="1170.0" y="111.00" text-anchor="end" font-size="17.25" fill="#6B7780">climatology / no residual skill</text>
+<line x1="170.0" y1="548.0" x2="170.0" y2="72" stroke="#16232B" stroke-width="1.8" marker-end="url(#axArrow)"/>
+<line x1="170.0" y1="548.0" x2="1190" y2="548.0" stroke="#16232B" stroke-width="1.8" marker-end="url(#axArrow)"/>
+<line x1="170.00" y1="548.0" x2="170.00" y2="556.0" stroke="#16232B" stroke-width="1.4" opacity="0.55"/>
+<text x="170.00" y="579.0" text-anchor="middle" font-size="17.25" fill="#6B7780" font-weight="400">0</text>
+<line x1="236.67" y1="548.0" x2="236.67" y2="556.0" stroke="#16232B" stroke-width="1.4" opacity="0.9"/>
+<text x="236.67" y="579.0" text-anchor="middle" font-size="17.25" fill="#3E4C55" font-weight="600">1</text>
+<line x1="503.33" y1="548.0" x2="503.33" y2="556.0" stroke="#16232B" stroke-width="1.4" opacity="0.55"/>
+<text x="503.33" y="579.0" text-anchor="middle" font-size="17.25" fill="#6B7780" font-weight="400">5</text>
+<line x1="836.67" y1="548.0" x2="836.67" y2="556.0" stroke="#16232B" stroke-width="1.4" opacity="0.9"/>
+<text x="836.67" y="579.0" text-anchor="middle" font-size="17.25" fill="#3E4C55" font-weight="600">10</text>
+<line x1="1170.00" y1="548.0" x2="1170.00" y2="556.0" stroke="#16232B" stroke-width="1.4" opacity="0.55"/>
+<text x="1170.00" y="579.0" text-anchor="middle" font-size="17.25" fill="#6B7780" font-weight="400">15</text>
+<text x="670.00" y="618.0" text-anchor="middle" font-size="18.4" fill="#3E4C55" letter-spacing="0.4">forecast lead time (days)</text>
+<text x="86" y="336.00" text-anchor="middle" font-size="18.4" fill="#3E4C55" letter-spacing="0.4" transform="rotate(-90 86 336.00)">forecast error  (lower is better)</text>
+<text x="1160.00" y="537.00" text-anchor="end" font-size="16.1" fill="#736A5C">measurement + representativeness floor</text>
+<path d="M 170.00 511.96 L 173.12 511.55 L 176.25 511.14 L 179.38 510.72 L 182.50 510.30 L 185.62 509.87 L 188.75 509.43 L 191.88 508.99 L 195.00 508.54 L 198.12 508.09 L 201.25 507.63 L 204.38 507.16 L 207.50 506.69 L 210.62 506.21 L 213.75 505.72 L 216.88 505.23 L 220.00 504.73 L 223.12 504.23 L 226.25 503.72 L 229.38 503.20 L 232.50 502.67 L 235.62 502.14 L 238.75 501.60 L 241.88 501.06 L 245.00 500.50 L 248.12 499.94 L 251.25 499.37 L 254.38 498.80 L 257.50 498.22 L 260.62 497.63 L 263.75 497.03 L 266.88 496.42 L 270.00 495.81 L 273.12 495.19 L 276.25 494.56 L 279.38 493.92 L 282.50 493.28 L 285.62 492.63 L 288.75 491.97 L 291.88 491.30 L 295.00 490.62 L 298.12 489.94 L 301.25 489.24 L 304.38 488.54 L 307.50 487.83 L 310.62 487.11 L 313.75 486.38 L 316.88 485.64 L 320.00 484.90 L 323.12 484.14 L 326.25 483.38 L 329.38 482.61 L 332.50 481.82 L 335.62 481.03 L 338.75 480.23 L 341.88 479.42 L 345.00 478.61 L 348.12 477.78 L 351.25 476.94 L 354.38 476.09 L 357.50 475.24 L 360.62 474.37 L 363.75 473.49 L 366.88 472.61 L 370.00 471.71 L 373.12 470.81 L 376.25 469.89 L 379.38 468.97 L 382.50 468.03 L 385.62 467.09 L 388.75 466.13 L 391.88 465.17 L 395.00 464.19 L 398.12 463.20 L 401.25 462.21 L 404.38 461.20 L 407.50 460.19 L 410.62 459.16 L 413.75 458.12 L 416.88 457.07 L 420.00 456.01 L 423.12 454.95 L 426.25 453.87 L 429.38 452.78 L 432.50 451.68 L 435.62 450.57 L 438.75 449.44 L 441.88 448.31 L 445.00 447.17 L 448.12 446.02 L 451.25 444.85 L 454.38 443.68 L 457.50 442.49 L 460.62 441.30 L 463.75 440.09 L 466.88 438.87 L 470.00 437.65 L 473.12 436.41 L 476.25 435.16 L 479.38 433.90 L 482.50 432.63 L 485.62 431.35 L 488.75 430.06 L 491.88 428.76 L 495.00 427.45 L 498.12 426.13 L 501.25 424.80 L 504.38 423.45 L 507.50 422.10 L 510.62 420.74 L 513.75 419.37 L 516.88 417.98 L 520.00 416.59 L 523.12 415.19 L 526.25 413.77 L 529.38 412.35 L 532.50 410.92 L 535.62 409.48 L 538.75 408.03 L 541.88 406.56 L 545.00 405.09 L 548.12 403.61 L 551.25 402.12 L 554.38 400.63 L 557.50 399.12 L 560.62 397.60 L 563.75 396.08 L 566.88 394.54 L 570.00 393.00 L 573.12 391.45 L 576.25 389.89 L 579.38 388.33 L 582.50 386.75 L 585.62 385.17 L 588.75 383.57 L 591.88 381.98 L 595.00 380.37 L 598.12 378.76 L 601.25 377.13 L 604.38 375.51 L 607.50 373.87 L 610.62 372.23 L 613.75 370.58 L 616.88 368.92 L 620.00 367.26 L 623.12 365.59 L 626.25 363.92 L 629.38 362.24 L 632.50 360.56 L 635.62 358.86 L 638.75 357.17 L 641.88 355.47 L 645.00 353.76 L 648.12 352.05 L 651.25 350.33 L 654.38 348.61 L 657.50 346.89 L 660.62 345.16 L 663.75 343.43 L 666.88 341.70 L 670.00 339.96 L 673.12 338.22 L 676.25 336.47 L 679.38 334.72 L 682.50 332.97 L 685.62 331.22 L 688.75 329.47 L 691.88 327.71 L 695.00 325.95 L 698.12 324.19 L 701.25 322.43 L 704.38 320.67 L 707.50 318.91 L 710.62 317.14 L 713.75 315.38 L 716.88 313.62 L 720.00 311.85 L 723.12 310.09 L 726.25 308.33 L 729.38 306.56 L 732.50 304.80 L 735.62 303.04 L 738.75 301.28 L 741.88 299.52 L 745.00 297.77 L 748.12 296.01 L 751.25 294.26 L 754.38 292.51 L 757.50 290.77 L 760.62 289.02 L 763.75 287.28 L 766.88 285.54 L 770.00 283.81 L 773.12 282.08 L 776.25 280.35 L 779.38 278.62 L 782.50 276.91 L 785.62 275.19 L 788.75 273.48 L 791.88 271.78 L 795.00 270.07 L 798.12 268.38 L 801.25 266.69 L 804.38 265.00 L 807.50 263.33 L 810.62 261.65 L 813.75 259.99 L 816.88 258.32 L 820.00 256.67 L 823.12 255.02 L 826.25 253.38 L 829.38 251.75 L 832.50 250.12 L 835.62 248.50 L 838.75 246.89 L 841.88 245.28 L 845.00 243.68 L 848.12 242.09 L 851.25 240.51 L 854.38 238.93 L 857.50 237.37 L 860.62 235.81 L 863.75 234.26 L 866.88 232.72 L 870.00 231.19 L 873.12 229.66 L 876.25 228.15 L 879.38 226.64 L 882.50 225.15 L 885.62 223.66 L 888.75 222.18 L 891.88 220.71 L 895.00 219.25 L 898.12 217.80 L 901.25 216.36 L 904.38 214.93 L 907.50 213.51 L 910.62 212.10 L 913.75 210.69 L 916.88 209.30 L 920.00 207.92 L 923.12 206.55 L 926.25 205.19 L 929.38 203.84 L 932.50 202.50 L 935.62 201.16 L 938.75 199.84 L 941.88 198.53 L 945.00 197.23 L 948.12 195.95 L 951.25 194.67 L 954.38 193.40 L 957.50 192.14 L 960.62 190.89 L 963.75 189.66 L 966.88 188.43 L 970.00 187.22 L 973.12 186.01 L 976.25 184.82 L 979.38 183.63 L 982.50 182.46 L 985.62 181.30 L 988.75 180.15 L 991.88 179.01 L 995.00 177.87 L 998.12 176.75 L 1001.25 175.65 L 1004.38 174.55 L 1007.50 173.46 L 1010.62 172.38 L 1013.75 171.31 L 1016.88 170.26 L 1020.00 169.21 L 1023.12 168.17 L 1026.25 167.15 L 1029.38 166.13 L 1032.50 165.13 L 1035.62 164.13 L 1038.75 163.15 L 1041.88 162.17 L 1045.00 161.21 L 1048.12 160.26 L 1051.25 159.31 L 1054.38 158.38 L 1057.50 157.45 L 1060.62 156.54 L 1063.75 155.64 L 1066.88 154.74 L 1070.00 153.86 L 1073.12 152.98 L 1076.25 152.12 L 1079.38 151.26 L 1082.50 150.42 L 1085.62 149.58 L 1088.75 148.75 L 1091.88 147.94 L 1095.00 147.13 L 1098.12 146.33 L 1101.25 145.54 L 1104.38 144.76 L 1107.50 143.99 L 1110.62 143.23 L 1113.75 142.47 L 1116.88 141.73 L 1120.00 140.99 L 1123.12 140.26 L 1126.25 139.55 L 1129.38 138.84 L 1132.50 138.13 L 1135.62 137.44 L 1138.75 136.76 L 1141.88 136.08 L 1145.00 135.41 L 1148.12 134.75 L 1151.25 134.10 L 1154.38 133.46 L 1157.50 132.82 L 1160.62 132.20 L 1163.75 131.58 L 1166.88 130.96 L 1170.00 130.36" fill="none" stroke="#B0432E" stroke-width="2.4" stroke-dasharray="7 6" stroke-linecap="round"/>
+<path d="M 170.00 420.80 L 173.12 419.64 L 176.25 418.46 L 179.38 417.26 L 182.50 416.05 L 185.62 414.81 L 188.75 413.55 L 191.88 412.27 L 195.00 410.97 L 198.12 409.66 L 201.25 408.32 L 204.38 406.96 L 207.50 405.58 L 210.62 404.17 L 213.75 402.75 L 216.88 401.31 L 220.00 399.85 L 223.12 398.36 L 226.25 396.86 L 229.38 395.33 L 232.50 393.79 L 235.62 392.22 L 238.75 390.64 L 241.88 389.03 L 245.00 387.40 L 248.12 385.76 L 251.25 384.09 L 254.38 382.40 L 257.50 380.70 L 260.62 378.97 L 263.75 377.23 L 266.88 375.46 L 270.00 373.68 L 273.12 371.88 L 276.25 370.06 L 279.38 368.22 L 282.50 366.36 L 285.62 364.49 L 288.75 362.60 L 291.88 360.69 L 295.00 358.77 L 298.12 356.83 L 301.25 354.88 L 304.38 352.91 L 307.50 350.92 L 310.62 348.93 L 313.75 346.91 L 316.88 344.89 L 320.00 342.85 L 323.12 340.80 L 326.25 338.73 L 329.38 336.66 L 332.50 334.57 L 335.62 332.48 L 338.75 330.37 L 341.88 328.26 L 345.00 326.14 L 348.12 324.01 L 351.25 321.87 L 354.38 319.73 L 357.50 317.58 L 360.62 315.42 L 363.75 313.26 L 366.88 311.10 L 370.00 308.93 L 373.12 306.76 L 376.25 304.58 L 379.38 302.41 L 382.50 300.23 L 385.62 298.06 L 388.75 295.88 L 391.88 293.71 L 395.00 291.54 L 398.12 289.37 L 401.25 287.20 L 404.38 285.04 L 407.50 282.88 L 410.62 280.73 L 413.75 278.58 L 416.88 276.44 L 420.00 274.30 L 423.12 272.18 L 426.25 270.06 L 429.38 267.95 L 432.50 265.85 L 435.62 263.76 L 438.75 261.68 L 441.88 259.61 L 445.00 257.55 L 448.12 255.51 L 451.25 253.47 L 454.38 251.45 L 457.50 249.45 L 460.62 247.46 L 463.75 245.48 L 466.88 243.52 L 470.00 241.57 L 473.12 239.64 L 476.25 237.72 L 479.38 235.82 L 482.50 233.94 L 485.62 232.08 L 488.75 230.23 L 491.88 228.40 L 495.00 226.59 L 498.12 224.79 L 501.25 223.02 L 504.38 221.27 L 507.50 219.53 L 510.62 217.81 L 513.75 216.12 L 516.88 214.44 L 520.00 212.78 L 523.12 211.14 L 526.25 209.53 L 529.38 207.93 L 532.50 206.35 L 535.62 204.79 L 538.75 203.26 L 541.88 201.74 L 545.00 200.25 L 548.12 198.78 L 551.25 197.32 L 554.38 195.89 L 557.50 194.48 L 560.62 193.09 L 563.75 191.71 L 566.88 190.36 L 570.00 189.03 L 573.12 187.73 L 576.25 186.44 L 579.38 185.17 L 582.50 183.92 L 585.62 182.69 L 588.75 181.48 L 591.88 180.29 L 595.00 179.12 L 598.12 177.97 L 601.25 176.84 L 604.38 175.73 L 607.50 174.64 L 610.62 173.57 L 613.75 172.51 L 616.88 171.48 L 620.00 170.46 L 623.12 169.46 L 626.25 168.48 L 629.38 167.52 L 632.50 166.57 L 635.62 165.64 L 638.75 164.73 L 641.88 163.84 L 645.00 162.96 L 648.12 162.10 L 651.25 161.26 L 654.38 160.43 L 657.50 159.62 L 660.62 158.82 L 663.75 158.04 L 666.88 157.28 L 670.00 156.53 L 673.12 155.79 L 676.25 155.07 L 679.38 154.36 L 682.50 153.67 L 685.62 152.99 L 688.75 152.33 L 691.88 151.68 L 695.00 151.04 L 698.12 150.42 L 701.25 149.81 L 704.38 149.21 L 707.50 148.62 L 710.62 148.05 L 713.75 147.49 L 716.88 146.94 L 720.00 146.40 L 723.12 145.87 L 726.25 145.35 L 729.38 144.85 L 732.50 144.36 L 735.62 143.87 L 738.75 143.40 L 741.88 142.94 L 745.00 142.48 L 748.12 142.04 L 751.25 141.61 L 754.38 141.18 L 757.50 140.77 L 760.62 140.37 L 763.75 139.97 L 766.88 139.58 L 770.00 139.20 L 773.12 138.83 L 776.25 138.47 L 779.38 138.11 L 782.50 137.77 L 785.62 137.43 L 788.75 137.10 L 791.88 136.78 L 795.00 136.46 L 798.12 136.15 L 801.25 135.85 L 804.38 135.55 L 807.50 135.26 L 810.62 134.98 L 813.75 134.71 L 816.88 134.44 L 820.00 134.17 L 823.12 133.92 L 826.25 133.67 L 829.38 133.42 L 832.50 133.18 L 835.62 132.95 L 838.75 132.72 L 841.88 132.49 L 845.00 132.27 L 848.12 132.06 L 851.25 131.85 L 854.38 131.65 L 857.50 131.45 L 860.62 131.26 L 863.75 131.07 L 866.88 130.88 L 870.00 130.70 L 873.12 130.52 L 876.25 130.35 L 879.38 130.18 L 882.50 130.02 L 885.62 129.86 L 888.75 129.70 L 891.88 129.55 L 895.00 129.40 L 898.12 129.25 L 901.25 129.11 L 904.38 128.97 L 907.50 128.83 L 910.62 128.70 L 913.75 128.57 L 916.88 128.44 L 920.00 128.32 L 923.12 128.20 L 926.25 128.08 L 929.38 127.96 L 932.50 127.85 L 935.62 127.74 L 938.75 127.64 L 941.88 127.53 L 945.00 127.43 L 948.12 127.33 L 951.25 127.23 L 954.38 127.14 L 957.50 127.04 L 960.62 126.95 L 963.75 126.87 L 966.88 126.78 L 970.00 126.70 L 973.12 126.61 L 976.25 126.53 L 979.38 126.45 L 982.50 126.38 L 985.62 126.30 L 988.75 126.23 L 991.88 126.16 L 995.00 126.09 L 998.12 126.02 L 1001.25 125.96 L 1004.38 125.89 L 1007.50 125.83 L 1010.62 125.77 L 1013.75 125.71 L 1016.88 125.65 L 1020.00 125.59 L 1023.12 125.54 L 1026.25 125.48 L 1029.38 125.43 L 1032.50 125.38 L 1035.62 125.33 L 1038.75 125.28 L 1041.88 125.23 L 1045.00 125.18 L 1048.12 125.14 L 1051.25 125.09 L 1054.38 125.05 L 1057.50 125.01 L 1060.62 124.96 L 1063.75 124.92 L 1066.88 124.88 L 1070.00 124.85 L 1073.12 124.81 L 1076.25 124.77 L 1079.38 124.74 L 1082.50 124.70 L 1085.62 124.67 L 1088.75 124.63 L 1091.88 124.60 L 1095.00 124.57 L 1098.12 124.54 L 1101.25 124.51 L 1104.38 124.48 L 1107.50 124.45 L 1110.62 124.42 L 1113.75 124.39 L 1116.88 124.37 L 1120.00 124.34 L 1123.12 124.32 L 1126.25 124.29 L 1129.38 124.27 L 1132.50 124.24 L 1135.62 124.22 L 1138.75 124.20 L 1141.88 124.18 L 1145.00 124.15 L 1148.12 124.13 L 1151.25 124.11 L 1154.38 124.09 L 1157.50 124.07 L 1160.62 124.05 L 1163.75 124.04 L 1166.88 124.02 L 1170.00 124.00" fill="none" stroke="#2A6E8F" stroke-width="2.8" stroke-dasharray="12 8" stroke-linecap="round"/>
+<path d="M 170.00 463.20 L 173.12 462.54 L 176.25 461.86 L 179.38 461.17 L 182.50 460.48 L 185.62 459.77 L 188.75 459.05 L 191.88 458.31 L 195.00 457.57 L 198.12 456.81 L 201.25 456.05 L 204.38 455.27 L 207.50 454.47 L 210.62 453.67 L 213.75 452.85 L 216.88 452.02 L 220.00 451.18 L 223.12 450.32 L 226.25 449.45 L 229.38 448.57 L 232.50 447.67 L 235.62 446.76 L 238.75 445.84 L 241.88 444.90 L 245.00 443.95 L 248.12 442.99 L 251.25 442.01 L 254.38 441.02 L 257.50 440.01 L 260.62 438.99 L 263.75 437.96 L 266.88 436.91 L 270.00 435.85 L 273.12 434.77 L 276.25 433.68 L 279.38 432.57 L 282.50 431.45 L 285.62 430.31 L 288.75 429.16 L 291.88 427.99 L 295.00 426.81 L 298.12 425.62 L 301.25 424.40 L 304.38 423.18 L 307.50 421.94 L 310.62 420.68 L 313.75 419.41 L 316.88 418.12 L 320.00 416.82 L 323.12 415.50 L 326.25 414.17 L 329.38 412.82 L 332.50 411.46 L 335.62 410.08 L 338.75 408.69 L 341.88 407.28 L 345.00 405.86 L 348.12 404.42 L 351.25 402.97 L 354.38 401.51 L 357.50 400.03 L 360.62 398.53 L 363.75 397.02 L 366.88 395.50 L 370.00 393.96 L 373.12 392.41 L 376.25 390.84 L 379.38 389.26 L 382.50 387.67 L 385.62 386.06 L 388.75 384.44 L 391.88 382.81 L 395.00 381.16 L 398.12 379.51 L 401.25 377.84 L 404.38 376.15 L 407.50 374.46 L 410.62 372.75 L 413.75 371.03 L 416.88 369.30 L 420.00 367.56 L 423.12 365.81 L 426.25 364.04 L 429.38 362.27 L 432.50 360.49 L 435.62 358.70 L 438.75 356.89 L 441.88 355.08 L 445.00 353.26 L 448.12 351.43 L 451.25 349.60 L 454.38 347.75 L 457.50 345.90 L 460.62 344.04 L 463.75 342.17 L 466.88 340.30 L 470.00 338.42 L 473.12 336.53 L 476.25 334.64 L 479.38 332.75 L 482.50 330.85 L 485.62 328.94 L 488.75 327.04 L 491.88 325.12 L 495.00 323.21 L 498.12 321.29 L 501.25 319.37 L 504.38 317.45 L 507.50 315.52 L 510.62 313.60 L 513.75 311.67 L 516.88 309.75 L 520.00 307.82 L 523.12 305.90 L 526.25 303.97 L 529.38 302.05 L 532.50 300.13 L 535.62 298.21 L 538.75 296.29 L 541.88 294.37 L 545.00 292.46 L 548.12 290.55 L 551.25 288.65 L 554.38 286.75 L 557.50 284.86 L 560.62 282.97 L 563.75 281.08 L 566.88 279.20 L 570.00 277.33 L 573.12 275.47 L 576.25 273.61 L 579.38 271.76 L 582.50 269.91 L 585.62 268.08 L 588.75 266.25 L 591.88 264.43 L 595.00 262.62 L 598.12 260.82 L 601.25 259.03 L 604.38 257.24 L 607.50 255.47 L 610.62 253.71 L 613.75 251.96 L 616.88 250.22 L 620.00 248.49 L 623.12 246.77 L 626.25 245.07 L 629.38 243.38 L 632.50 241.69 L 635.62 240.02 L 638.75 238.37 L 641.88 236.72 L 645.00 235.09 L 648.12 233.47 L 651.25 231.87 L 654.38 230.28 L 657.50 228.70 L 660.62 227.14 L 663.75 225.59 L 666.88 224.05 L 670.00 222.53 L 673.12 221.02 L 676.25 219.53 L 679.38 218.05 L 682.50 216.58 L 685.62 215.14 L 688.75 213.70 L 691.88 212.28 L 695.00 210.88 L 698.12 209.48 L 701.25 208.11 L 704.38 206.75 L 707.50 205.40 L 710.62 204.07 L 713.75 202.76 L 716.88 201.46 L 720.00 200.17 L 723.12 198.90 L 726.25 197.65 L 729.38 196.41 L 732.50 195.19 L 735.62 193.98 L 738.75 192.78 L 741.88 191.60 L 745.00 190.44 L 748.12 189.29 L 751.25 188.15 L 754.38 187.03 L 757.50 185.93 L 760.62 184.84 L 763.75 183.76 L 766.88 182.70 L 770.00 181.65 L 773.12 180.62 L 776.25 179.60 L 779.38 178.60 L 782.50 177.61 L 785.62 176.63 L 788.75 175.67 L 791.88 174.72 L 795.00 173.79 L 798.12 172.87 L 801.25 171.96 L 804.38 171.07 L 807.50 170.19 L 810.62 169.32 L 813.75 168.46 L 816.88 167.62 L 820.00 166.79 L 823.12 165.98 L 826.25 165.17 L 829.38 164.38 L 832.50 163.60 L 835.62 162.84 L 838.75 162.08 L 841.88 161.34 L 845.00 160.61 L 848.12 159.89 L 851.25 159.18 L 854.38 158.49 L 857.50 157.80 L 860.62 157.13 L 863.75 156.46 L 866.88 155.81 L 870.00 155.17 L 873.12 154.54 L 876.25 153.92 L 879.38 153.31 L 882.50 152.71 L 885.62 152.12 L 888.75 151.54 L 891.88 150.97 L 895.00 150.41 L 898.12 149.86 L 901.25 149.32 L 904.38 148.79 L 907.50 148.27 L 910.62 147.75 L 913.75 147.25 L 916.88 146.75 L 920.00 146.27 L 923.12 145.79 L 926.25 145.32 L 929.38 144.85 L 932.50 144.40 L 935.62 143.95 L 938.75 143.52 L 941.88 143.09 L 945.00 142.66 L 948.12 142.25 L 951.25 141.84 L 954.38 141.44 L 957.50 141.05 L 960.62 140.66 L 963.75 140.28 L 966.88 139.91 L 970.00 139.55 L 973.12 139.19 L 976.25 138.84 L 979.38 138.49 L 982.50 138.15 L 985.62 137.82 L 988.75 137.49 L 991.88 137.17 L 995.00 136.85 L 998.12 136.54 L 1001.25 136.24 L 1004.38 135.94 L 1007.50 135.65 L 1010.62 135.36 L 1013.75 135.08 L 1016.88 134.81 L 1020.00 134.53 L 1023.12 134.27 L 1026.25 134.01 L 1029.38 133.75 L 1032.50 133.50 L 1035.62 133.25 L 1038.75 133.01 L 1041.88 132.77 L 1045.00 132.54 L 1048.12 132.31 L 1051.25 132.09 L 1054.38 131.87 L 1057.50 131.65 L 1060.62 131.44 L 1063.75 131.23 L 1066.88 131.03 L 1070.00 130.83 L 1073.12 130.63 L 1076.25 130.44 L 1079.38 130.25 L 1082.50 130.07 L 1085.62 129.89 L 1088.75 129.71 L 1091.88 129.53 L 1095.00 129.36 L 1098.12 129.20 L 1101.25 129.03 L 1104.38 128.87 L 1107.50 128.71 L 1110.62 128.56 L 1113.75 128.40 L 1116.88 128.26 L 1120.00 128.11 L 1123.12 127.97 L 1126.25 127.82 L 1129.38 127.69 L 1132.50 127.55 L 1135.62 127.42 L 1138.75 127.29 L 1141.88 127.16 L 1145.00 127.04 L 1148.12 126.91 L 1151.25 126.79 L 1154.38 126.68 L 1157.50 126.56 L 1160.62 126.45 L 1163.75 126.34 L 1166.88 126.23 L 1170.00 126.12" fill="none" stroke="#16232B" stroke-width="3.0" stroke-linecap="round"/>
+<line x1="196.0" y1="149.00" x2="238.0" y2="149.00" stroke="#2A6E8F" stroke-width="2.8" stroke-dasharray="12 8" stroke-linecap="round"/>
+<text x="252.0" y="154.0" font-size="17.25" font-weight="600" fill="#16232B">current practice</text>
+<line x1="196.0" y1="179.00" x2="238.0" y2="179.00" stroke="#16232B" stroke-width="3.0" stroke-linecap="round"/>
+<text x="252.0" y="184.0" font-size="17.25" font-weight="600" fill="#16232B">estimated attainable envelope</text>
+<line x1="196.0" y1="209.00" x2="238.0" y2="209.00" stroke="#B0432E" stroke-width="2.4" stroke-dasharray="7 6" stroke-linecap="round"/>
+<text x="252.0" y="214.0" font-size="17.25" font-weight="600" fill="#16232B">governed alarm threshold</text>
+<line x1="583.33" y1="187.59" x2="583.33" y2="265.42" stroke="#16232B" stroke-width="1.7" marker-start="url(#dimArrow)" marker-end="url(#dimArrow)"/>
+<rect x="533.0" y="207.0" width="100.0" height="34.0" rx="7" fill="#FDFCFA" stroke="#CFC9BC" stroke-width="1"/>
+<text x="583.00" y="229.50" text-anchor="middle" font-size="16.1" font-weight="600" fill="#16232B">headroom</text>
+<path d="M 775.33 183.90 L 928 183.90 L 940.00 215.00" fill="none" stroke="#6B7780" stroke-width="1.1" opacity="0.7" stroke-linejoin="round"/>
+<g stroke="#16232B" stroke-width="2" stroke-linecap="round"><line x1="763.33" y1="157.90" x2="763.33" y2="209.90"/><line x1="752.33" y1="157.90" x2="774.33" y2="157.90"/><line x1="752.33" y1="209.90" x2="774.33" y2="209.90"/></g>
+<circle cx="763.33" cy="183.90" r="3.4" fill="#16232B"/>
+<rect x="940.0" y="206.0" width="232.0" height="66.0" rx="8" fill="#FDFCFA" stroke="#CFC9BC" stroke-width="1"/>
+<text x="958.0" y="234.0" font-size="16.1" fill="#3E4C55">sampling uncertainty</text>
+<text x="958.0" y="257.0" font-size="16.1" fill="#3E4C55">on a reported score</text>
+<text x="1164.00" y="392" text-anchor="end" font-size="23" font-weight="700" letter-spacing="1.8" fill="#B0432E">INVESTIGATE</text>
+<text x="1164.00" y="422" text-anchor="end" font-size="17.25" fill="#B0432E" opacity="0.88">sustained performance</text>
+<text x="1164.00" y="446" text-anchor="end" font-size="17.25" fill="#B0432E" opacity="0.88">below the governed alarm threshold</text>
+</svg>
+<figcaption><b>Figure 1 - Error growth and an optional tripwire.</b> Schematic only. Current error rises toward climatology with lead time. Any alarm threshold would be governed conservatively below the attainable envelope.</figcaption>
+</figure>
+<h2 id="the-construction">The construction</h2>
+<p>Our temporal lockbox has four parts: (1) the target does not exist when the forecast is committed; (2) an external physical process generates it later, beyond any participant’s control at the scored scale; (3) independent sources can verify the outcome; and (4) the organizers commit the format, data vintage, station draw, scorer, and computing environment in advance. Physics secures the target; transparent procedures make the surrounding system auditable.</p>
+<p>This differs from hiding an answer. A sealed secret still has key material, a custodian, an insider risk, and a future moment of decryption. A target that does not yet exist has none of those. No human can leak it, and no later advance can break an encrypted file containing it. Verification comes instead from institutions that measure the world for their own purposes.</p>
+<p>The data flow also likely prevents test-set contamination. With 500 stations, three variables, and ten lead times, the protocol could generate about 15,000 new scored values each day - roughly 5.5 million a year. None existed when the matching forecast was written, so they cannot have appeared in training data or an archive.</p>
+<p>A hosted run could last weeks. The hosted AI agent would have one objective: improve its forecast. It could retrain or fine-tune model weights, modify its tools, data pipeline, post-processing, and ensemble strategy, or self-improve its harness. All changes would be judged against the same future observations, allowing comparisons at matched compute or a combined search over methods.</p>
+<p>Before a fixed daily cutoff, the agent submits predictive distributions for specified variables, stations, and lead times. The platform canonicalizes the file, records its cryptographic fingerprint in a public append-only log, and independently timestamps the log.[22] After valid time and a predeclared reporting delay, the platform freezes the observation snapshot and its quality-control manifest. A pre-specified public randomness source then selects the scored stations.[21] The platform publishes the forecast, snapshot, draw, inclusions and exclusions, and runs the pre-committed scorer. Anyone with the same inputs should reproduce the same result.</p>
+<figure>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 324" width="1240" height="324" role="img" shape-rendering="geometricPrecision" aria-label="Timeline of one forecast cycle: commit, valid time, freeze data, draw the scored subset, and reveal plus score.">
+  <style>
+    .m    { font-family: "IBM Plex Mono","JetBrains Mono","SF Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; }
+    .ttl  { font-size: 16.64px; font-weight: 700; letter-spacing: 1.8px; fill: #1D3746; }
+    .dsc  { font-size: 16.64px; font-weight: 400; letter-spacing: .1px;  fill: #55697A; }
+    .tim  { font-size: 15.36px; font-weight: 400; letter-spacing: .8px;  fill: #929FA8; }
+    .gap  { font-size: 13.44px; font-weight: 700; letter-spacing: 1.5px; fill: #6E5316; }
+    .cap  { font-size: 17.92px; font-weight: 400; fill: #55697A; }
+    .capb { font-weight: 700; fill: #1D3746; }
+  </style>
+
+  <rect width="1240" height="324" fill="#FAFAF7"/>
+
+  <g class="m">
+
+    <g>
+      <rect x="190" y="114" width="351" height="26" rx="3" fill="#8A6A1F" fill-opacity=".13"/>
+      <line x1="190" y1="110" x2="190" y2="144" stroke="#8A6A1F" stroke-width="2"/>
+      <line x1="541" y1="110" x2="541" y2="144" stroke="#8A6A1F" stroke-width="2"/>
+      <text class="gap" x="366" y="131" text-anchor="middle">CAUSAL GAP · TARGET ABSENT</text>
+    </g>
+
+    <g stroke-width="1.4" stroke-linecap="round">
+      <line x1="190" y1="148" x2="190" y2="196" stroke="#8A6A1F" stroke-opacity=".75"/>
+      <line x1="541" y1="96" x2="541" y2="148" stroke="#8A6A1F" stroke-opacity=".75"/>
+      <line x1="748" y1="148" x2="748" y2="196" stroke="#1D3746" stroke-opacity=".45"/>
+      <line x1="924" y1="96" x2="924" y2="148" stroke="#1D3746" stroke-opacity=".45"/>
+      <line x1="1071" y1="148" x2="1071" y2="196" stroke="#1D3746" stroke-opacity=".45"/>
+    </g>
+
+    <line x1="76" y1="148" x2="1172" y2="148" stroke="#16232B" stroke-width="1.8"/>
+    <path d="M1170 141.5 L1188 148 L1170 154.5 Z" fill="#16232B"/>
+
+    <g stroke="#FAFAF7" stroke-width="3.5">
+      <circle cx="190" cy="148" r="6.5" fill="#8A6A1F"/>
+      <circle cx="541" cy="148" r="6.5" fill="#8A6A1F"/>
+      <circle cx="748" cy="148" r="5.5" fill="#1D3746"/>
+      <circle cx="924" cy="148" r="5.5" fill="#1D3746"/>
+      <circle cx="1071" cy="148" r="5.5" fill="#1D3746"/>
+    </g>
+
+    <g text-anchor="middle">
+      <text class="ttl" x="541" y="58">VALID TIME</text>
+      <text class="dsc" x="541" y="80">atmosphere creates outcome</text>
+
+      <text class="ttl" x="924" y="58">DRAW SUBSET</text>
+      <text class="dsc" x="924" y="80">public randomness after snapshot</text>
+    </g>
+
+    <g text-anchor="middle">
+      <text class="ttl" x="190" y="220">COMMIT</text>
+      <text class="dsc" x="190" y="242">canonical forecast sealed</text>
+      <text class="dsc" x="190" y="263">hash → public log</text>
+
+      <text class="ttl" x="748" y="220">FREEZE DATA</text>
+      <text class="dsc" x="748" y="242">fixed observation vintage</text>
+      <text class="dsc" x="748" y="263">QC + inclusion manifest</text>
+
+      <text class="ttl" x="1071" y="220">REVEAL + SCORE</text>
+      <text class="dsc" x="1071" y="242">publish all inputs</text>
+      <text class="dsc" x="1071" y="263">anyone can recompute</text>
+    </g>
+
+    <g text-anchor="middle">
+      <text class="tim" x="190" y="300">t0</text>
+      <text class="tim" x="541" y="300">t0 + 24...240 h</text>
+    </g>
+
+    </g>
+</svg>
+<figcaption><b>Figure 2 - One forecast cycle.</b> The protocol is fixed beforehand. A canonical forecast is committed before the target exists; after valid time the observation snapshot is frozen, the scored subset is drawn from public randomness, and all inputs needed to recompute the score are published.</figcaption>
+</figure>
+<h2 id="why-the-causal-gap-matters">Why the causal gap matters</h2>
+<p>Most evaluations couple incentive and access. The same generally capable system that can solve the task may also reach the test set, grader, oracle, or flag. A high score is then ambiguous: it may reflect skill or a shortcut (reward hacking, specification gaming). Any boundary probing or manipulation that improves the score gives the agent a potential avenue to deceive.</p>
+<p>A temporal lockbox keeps the incentive but narrows the agent’s reach. A hosted weather agent can receive daily scores, work on a valuable forecasting problem, and modify its models and tools. It cannot read a future observation or steer synoptic weather. The remaining shortcuts become more concrete: copy public forecasts, alter a sensor or data stream, exploit the commitment or scoring software, influence an operator, or possibly escape to obtain more compute or credentials. Each route crosses a gate that can, in principle, be instrumented.</p>
+<figure>
+<svg xmlns="http://www.w3.org/2000/svg" id="fig3" viewBox="0 0 1440 860" width="1440" height="860" role="img" style="max-width:100%;height:auto;display:block" aria-label="Causal boundary diagram: a hosted forecasting agent can send a public commitment and receive past data and delayed score feedback, but cannot read or set the future station value; five monitored routes remain.">
+  <style>
+#fig3 text { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace; fill: #1C232B; }
+    #fig3 .panel   { fill: #FFFFFF; stroke: #1C232B; stroke-width: 2; }
+    #fig3 .zone    { fill: #E7EFF0; stroke: #C6D9DE; stroke-width: 1.5; }
+    #fig3 .pill    { fill: #FFFFFF; stroke: #1C232B; stroke-width: 1.5; }
+    #fig3 .rbox    { fill: #FFF9F7; stroke: #B85A48; stroke-width: 1.8; }
+    #fig3 .rdot    { fill: #FFFFFF; stroke: #B85A48; stroke-width: 1.8; }
+    #fig3 .hair    { stroke: #C6D9DE; stroke-width: 1.2; }
+    #fig3 .rule    { stroke: #DCE0DD; stroke-width: 1.5; }
+
+    #fig3 .flow    { fill: none; stroke: #1C232B; stroke-width: 2.4; stroke-linecap: round; }
+    #fig3 .flow-t  { fill: none; stroke: #1D5A6E; stroke-width: 2.4; stroke-linecap: round; }
+    #fig3 .flow-d  { fill: none; stroke: #1D5A6E; stroke-width: 2.4; stroke-linecap: round;
+                     stroke-dasharray: 9 7; }
+    #fig3 .barrier { stroke: #1C232B; stroke-width: 4.5; stroke-linecap: round; }
+    #fig3 .xmark   { stroke: #A93F2E; stroke-width: 3.6; stroke-linecap: round; }
+    #fig3 .loop    { fill: none; stroke: #1D5A6E; stroke-width: 3.4; stroke-linecap: round; }
+
+    #fig3 .eyebrow { font-size: 25.2px; font-weight: 700; letter-spacing: 2.6px; }
+    #fig3 .cap-h   { font-size: 22.8px; font-weight: 700; letter-spacing: 2.2px; }
+    #fig3 .cap-m   { font-size: 20.4px; font-weight: 700; letter-spacing: 1.7px; }
+    #fig3 .lede    { font-size: 19.2px; fill: #66727C; }
+    #fig3 .item    { font-size: 19.2px; fill: #535E68; }
+    #fig3 .sub     { font-size: 18.6px; fill: #66727C; }
+    #fig3 .note    { font-size: 18px; fill: #66727C; }
+    #fig3 .tag     { font-size: 15.5px; font-weight: 700; letter-spacing: 0.9px; }
+    #fig3 .tag-l   { font-size: 15.5px; font-weight: 700; letter-spacing: 0.6px; }
+    #fig3 .alert   { font-size: 16.8px; font-weight: 700; letter-spacing: 1.6px; fill: #A93F2E; }
+    #fig3 .sec     { font-size: 20.4px; font-weight: 700; letter-spacing: 2.1px; fill: #A93F2E; }
+    #fig3 .route   { font-size: 17.76px; font-weight: 700; letter-spacing: 0.3px; fill: #A93F2E; }
+    #fig3 .rnum    { font-size: 17.4px; font-weight: 700; fill: #A93F2E; }
+    #fig3 .loop-l  { font-size: 19.2px; fill: #1D5A6E; letter-spacing: 0.4px; }
+    #fig3 .fig     { font-size: 22.8px; fill: #535E68; }
+    #fig3 .fig-b   { font-weight: 700; fill: #1D5A6E; }
+    #fig3 .mid     { text-anchor: middle; }
+    #fig3 .end     { text-anchor: end; }
+  </style>
+
+  <defs>
+    <marker id="f3-arrow-ink" viewBox="0 0 10 10" refX="8.6" refY="5" markerWidth="6.2" markerHeight="6.2" orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M0.4,0.9 L9,5 L0.4,9.1 Z" style="fill:#1C232B"/>
+    </marker>
+    <marker id="f3-arrow-teal" viewBox="0 0 10 10" refX="8.6" refY="5" markerWidth="6.2" markerHeight="6.2" orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M0.4,0.9 L9,5 L0.4,9.1 Z" style="fill:#1D5A6E"/>
+    </marker>
+    <marker id="f3-arrow-loop" viewBox="0 0 10 10" refX="8.4" refY="5" markerWidth="4.6" markerHeight="4.6" orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M0.4,0.9 L9,5 L0.4,9.1 Z" style="fill:#1D5A6E"/>
+    </marker>
+    <filter id="f3-soft" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="2.5" stdDeviation="4" flood-color="#0C1D24" flood-opacity="0.09"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="1440" height="860" style="fill:#FAFAF7"/>
+
+  <rect class="zone" x="556" y="96" width="232" height="472" rx="14"/>
+  <text class="cap-m mid" x="672" y="142">CAUSAL</text>
+  <text class="cap-m mid" x="672" y="167">BOUNDARY</text>
+  <text class="alert mid" x="672" y="199">NO DIRECT PATH</text>
+
+  <line class="barrier" x1="665" y1="206" x2="665" y2="452"/>
+  <line class="barrier" x1="679" y1="206" x2="679" y2="452"/>
+
+  <text class="note mid" x="672" y="492">future value</text>
+  <text class="note mid" x="672" y="515">cannot be read or set</text>
+  <text class="note mid" x="672" y="538">before valid time</text>
+
+  <g filter="url(#f3-soft)">
+    <rect class="panel" x="64" y="96" width="456" height="472" rx="14"/>
+  </g>
+  <text class="eyebrow" x="96" y="143">HOSTED AGENT</text>
+  <text class="lede" x="96" y="181">sustained objective: forecast better</text>
+  <line class="hair" x1="96" y1="203" x2="488" y2="203"/>
+
+  <g>
+    <rect x="96" y="224" width="6" height="6" rx="1.5" style="fill:#2A6E8F"/>
+    <text class="item" x="118" y="235">modify model weights and tools</text>
+    <rect x="96" y="256" width="6" height="6" rx="1.5" style="fill:#2A6E8F"/>
+    <text class="item" x="118" y="267">rewrite pipelines and ensembles</text>
+    <rect x="96" y="288" width="6" height="6" rx="1.5" style="fill:#2A6E8F"/>
+    <text class="item" x="118" y="299">daily score; measured resources</text>
+    <rect x="96" y="320" width="6" height="6" rx="1.5" style="fill:#2A6E8F"/>
+    <text class="item" x="118" y="331">prompts, tool calls,</text>
+    <text class="item" x="118" y="357">checkpoints logged</text>
+  </g>
+
+  <path class="loop" d="M340.9,430.2 A 52 52 0 1 1 301.0,396.8" marker-end="url(#f3-arrow-loop)"/>
+  <text class="loop-l mid" x="292" y="530">optimization loop</text>
+
+  <rect class="zone" x="828" y="96" width="548" height="100" rx="14"/>
+  <text class="cap-h mid" x="1102" y="137">FUTURE ATMOSPHERE</text>
+  <text class="sub mid" x="1102" y="168">generates the station-hour outcome</text>
+
+  <line class="flow" x1="1102" y1="200" x2="1102" y2="292" marker-end="url(#f3-arrow-ink)"/>
+
+  <g filter="url(#f3-soft)">
+    <rect class="panel" x="828" y="300" width="548" height="104" rx="12"/>
+  </g>
+  <text class="cap-m mid" x="1102" y="341">SENSORS + OBSERVATION SNAPSHOT</text>
+  <text class="sub mid" x="1102" y="372">independent sources · fixed vintage</text>
+
+  <line class="flow" x1="1102" y1="408" x2="1102" y2="440" marker-end="url(#f3-arrow-ink)"/>
+
+  <g filter="url(#f3-soft)">
+    <rect class="panel" x="828" y="448" width="548" height="104" rx="12"/>
+  </g>
+  <text class="cap-m mid" x="1102" y="489">DETERMINISTIC SCORER</text>
+  <text class="sub mid" x="1102" y="520">precommitted code + public manifest</text>
+
+  <line class="flow" x1="520" y1="214" x2="655" y2="214"/>
+  <g class="xmark">
+    <line x1="659" y1="201" x2="685" y2="227"/>
+    <line x1="685" y1="201" x2="659" y2="227"/>
+  </g>
+
+  <line class="flow-t" x1="520" y1="290" x2="812" y2="290" marker-end="url(#f3-arrow-teal)"/>
+  <rect class="pill" x="554" y="242" width="304" height="32" rx="16"/>
+  <text class="tag mid" x="706" y="264">FORECAST → PUBLIC COMMITMENT</text>
+
+  <line class="flow-d" x1="828" y1="364" x2="524" y2="364" marker-end="url(#f3-arrow-teal)"/>
+  <rect class="pill" x="580" y="316" width="184" height="32" rx="16"/>
+  <text class="tag mid" x="672" y="338">PAST DATA ONLY</text>
+
+  <path class="flow-d" d="M1102,556 V604 Q1102,616 1090,616 H328 Q316,616 316,604 V576" marker-end="url(#f3-arrow-teal)"/>
+  <rect class="pill" x="516" y="599" width="488" height="34" rx="17"/>
+  <text class="tag-l mid" x="760" y="622">delayed score feedback · no counterfactual value</text>
+  <text class="note end" x="1376" y="662">attempts become trace data even when the score does not move</text>
+
+  <text class="sec" x="64" y="710">MONITORED MISALIGNMENT ROUTES AND TARGETS</text>
+
+  <g>
+    <rect class="rbox" x="64" y="732" width="245" height="104" rx="12"/>
+    <circle class="rdot" cx="96" cy="784" r="14"/>
+    <text class="rnum mid" x="96" y="789">1</text>
+    <text class="route" x="120" y="778">external guidance</text>
+    <text class="route" x="120" y="804">or data barrier</text>
+  </g>
+  <g>
+    <rect class="rbox" x="331" y="732" width="245" height="104" rx="12"/>
+    <circle class="rdot" cx="363" cy="784" r="14"/>
+    <text class="rnum mid" x="363" y="789">2</text>
+    <text class="route" x="387" y="778">sensor</text>
+    <text class="route" x="387" y="804">surroundings</text>
+  </g>
+  <g>
+    <rect class="rbox" x="598" y="732" width="245" height="104" rx="12"/>
+    <circle class="rdot" cx="630" cy="784" r="14"/>
+    <text class="rnum mid" x="630" y="789">3</text>
+    <text class="route" x="654" y="778">observation</text>
+    <text class="route" x="654" y="804">stream</text>
+  </g>
+  <g>
+    <rect class="rbox" x="865" y="732" width="245" height="104" rx="12"/>
+    <circle class="rdot" cx="897" cy="784" r="14"/>
+    <text class="rnum mid" x="897" y="789">4</text>
+    <text class="route" x="921" y="778">protocol</text>
+    <text class="route" x="921" y="804">and scorer</text>
+  </g>
+  <g>
+    <rect class="rbox" x="1132" y="732" width="245" height="104" rx="12"/>
+    <circle class="rdot" cx="1164" cy="784" r="14"/>
+    <text class="rnum mid" x="1164" y="789">5</text>
+    <text class="route" x="1188" y="778">operators, compute</text>
+    <text class="route" x="1188" y="804">and credentials</text>
+  </g>
+
+  </svg>
+<figcaption><b>Figure 3 - What causality protects, and what remains vulnerable.</b> The agent cannot read or set the future station value. It can still seek easier routes through information access, sensors, data handling, scoring software, or people and resources. Those routes remain ordinary engineering risks, but they are explicit and instrumentable; feedback arrives later and reveals no counterfactual.</figcaption>
+</figure>
+<p>First, commitment makes the score harder to alter, but not necessarily more meaningful. An entrant can still copy public forecasts, exploit station bias, submit many variants, or exploit the scorer. The lockbox secures when the forecast was made and how it was scored; it does not by itself identify the capability that produced it.</p>
+<p>Second, the most informative evidence may sit outside the score. Attempts to bypass a data embargo, change a harness, tamper with a sensor, or influence an operator can leave traces even when they fail. Those traces are not self-interpreting: the platform must record prompts, tools, checkpoints, and operator actions well enough to distinguish model behaviours.</p>
+<p>Third, an agent seeking a shortcut must act with weak feedback relative to standard AI evaluations. A sensor intervention happens before the undisturbed value exists, and the agent never learns what the sensor would have read otherwise. It cannot test the intervention quickly, undo it after learning that it was unnecessary, or stop after one successful retrieval of an answer key. The public forecast also fixes its stated expectation before the outcome is known. Delayed scores still provide some feedback, but the fast loop that makes concealment easy is weakened.</p>
+<p>Altogether, this forms a framework for an observatory on AI misalignment, beyond merely a cleaner evaluation.</p>
+<h2 id="why-weather-is-the-leading-candidate">Why weather is the leading candidate</h2>
+<p>Many natural systems could supply future targets: tides, orbital states, space weather, earthquakes, and seasonal climate. Weather stands out because the physics is matched by infrastructure. International observing networks publish frequent measurements; operational centres issue several forecasts a day; and a mature research community already studies predictability, verification, and data quality.</p>
+<p>It is worth considering various alternatives. Astronomical tide at an ordinary gauge is nearly solved, while total water level includes weather-driven surge. Planetary ephemerides are nearly solved at human horizons, but uncontrolled debris and re-entry remain uncertain because drag depends on the upper atmosphere and object orientation. The table compares these alternative predictive tasks.</p>
+<div class="tblwrap"><table><caption>Table 1 - Candidate targets for a temporal lockbox</caption><thead><tr><th scope="col">Target</th><th scope="col">Future value unavailable at commit?</th><th scope="col">Resists direct steering?</th><th scope="col">Skill headroom?</th><th scope="col">Independent observations</th><th scope="col">Feedback</th><th scope="col">Assessment</th></tr></thead><tbody><tr class="hero"><td>Station weather · named variables · 1-10 d</td><td>Yes</td><td>Strong at synoptic scale; sensor exposed</td><td>Strong</td><td>Strong and distributed</td><td>Daily</td><td>Leading candidate</td></tr><tr><td>Astronomical tide · harmonic component</td><td>Weak; nearly derivable now</td><td>Strong</td><td>Weak; near-solved</td><td>Strong</td><td>Hours</td><td>Too little headroom</td></tr><tr><td>Total water level · gauge · 1-5 d</td><td>Yes</td><td>Partial; local exposure</td><td>Strong</td><td>Strong</td><td>Hours-days</td><td>Promising weather-linked variant</td></tr><tr><td>Uncontrolled LEO debris or re-entry · 3-10 d</td><td>Yes</td><td>Strong if truly uncontrolled</td><td>Strong</td><td>Limited or restricted</td><td>Days; event-driven</td><td>Promising second domain</td></tr><tr><td>Earthquake occurrence · useful regional lead</td><td>Yes</td><td>Strong</td><td>Weak at useful lead</td><td>Strong</td><td>Irregular and sparse</td><td>Poor for frequent scoring</td></tr><tr><td>Solar or geomagnetic events · hours-days</td><td>Yes</td><td>Strong</td><td>Moderate</td><td>Moderate; fewer networks</td><td>Event-driven</td><td>Promising but irregular</td></tr><tr><td>Seasonal climate index · months</td><td>Yes</td><td>Strong</td><td>Moderate</td><td>Strong</td><td>Months</td><td>Feedback too slow</td></tr><tr><td>Financial price · seconds-days</td><td>Yes</td><td>Weak; reflexive</td><td>Strong</td><td>Strong</td><td>Seconds</td><td>Fails causal independence</td></tr><tr><td>Election or human event · days-months</td><td>Yes</td><td>Weak; influenceable</td><td>Moderate</td><td>Partial</td><td>Periodic</td><td>Fails causal independence</td></tr></tbody></table></div>
+<p class="legend">Strong = property largely holds · Partial = conditional or design-dependent · Weak = property fails.</p>
+<p>Earthquakes offer too little short-lead skill for frequent scoring. Solar and geomagnetic events are promising but event-driven. Seasonal climate provides slow feedback. Markets, elections, and other societal events fail because both the forecasts and the agent being evaluated can influence the outcome. Weather is therefore the leading candidate not because all alternatives fail, but because it offers frequent and numerous targets, cannot be meaningfully steered, and its observing and verification ecosystem already supports daily, distributed measurement.</p>
+<h1 class="part" id="part-ii-building-an-observatory">Part II · Building an observatory</h1>
+<p>Here we ask what a working platform would require, where ordinary engineering begins, and what the proposal still cannot establish.</p>
+<p>The architecture, costs, and thresholds below are exploratory. They are intended to make the open misalignment questions concrete: what the score measures, how observations and software can be compromised, how deliberate underperformance manifests, and how monitoring changes behaviour.</p>
+<h2 id="two-possible-products">Two possible products</h2>
+<p>We consider two products that may share a commitment log but not infrastructure. An open registry would accept self-hosted, identity-bound forecasts and publish a reproducible performance record. A hosted observatory would run a smaller number of verified agents in isolated, instrumented environments and collect behavioural evidence. The registry needs openness; the observatory needs controlled access and monitoring.</p>
+<p>The registry is the nearer-term product. Pre-valid-time commitments, fixed observation snapshots, and reproducible scoring create a record that cannot be rewritten after the fact. It measures only what entrants choose to demonstrate. Non-participation and deliberate underperformance remain invisible, and a self-hosted score does not prove which model or agent produced the forecast.</p>
+<p>The hosted observatory would add provenance: the base model, prompts, tools, checkpoints, network requests, resource use, and operator interactions for consented runs. Raw publication may not be appropriate because traces may contain intellectual property, personal data, isolation details, or methods for attacking meteorological infrastructure. Delayed release, redaction, and governed research access would likely be needed.</p>
+<p>The two products support different claims. The registry could provide a longitudinal record that cannot be memorized. The hosted arm could test long-running self-optimizing agents in a setting where the physical answer does not pre-exist. Other institutions could implement the same commitment format for third-party testing. More generally, the design shows that one component of evaluation integrity can rest on physical structure and open verification rather than institutional trust.</p>
+<p>A null result would still be informative. If no agent behaves improperly, the platform would have produced a strong weather benchmark and a documented record of ordinary agent behaviours under sustained optimization pressure.</p>
+<h2 id="what-remains-unresolved">What remains unresolved</h2>
+<p>Physics protects only the future outcome. At least four vulnerabilities remain: the sensor and its surroundings; the observation stream; the commitment and scoring software; and the people and institutions that operate the platform. A fifth problem lies outside the system: participants may withhold capability or decline to enter. These limitations can at least be named in advance, and many may leave evidence of misalignment outside the final score. Whether that evidence is sufficient is an empirical question. Some of these issues are explored further below.</p>
+<h2 id="appendix-a-predictability-measurement-and-an-alarm-threshold">Appendix A · Predictability, measurement, and an alarm threshold</h2>
+<p>A working platform may need quantitative targets, measurement rules, sampling plans, and perhaps a conservative alarm threshold ('tripwire').</p>
+<h3 id="a-1-what-the-physics-does-and-does-not-establish">A.1 · What the physics does and does not establish</h3>
+<p>Lorenz showed that some multiscale flows can have a finite predictability range even as initial error tends to zero. Rotunno and Snyder showed that the conclusion depends on the model and energy spectrum, with both limited and unlimited cases.[3-4] In near-perfect-model experiments, Zhang and colleagues found practical midlatitude skill near ten days and roughly five extra days from a tenfold improvement in initial conditions for the cases studied.[5]</p>
+<p>Vonich and Hakim obtained skill beyond 30 days by optimizing initial conditions against the trajectory that later verified.[6] Because the outcome enters the optimization, the result measures potential headroom rather than operational forecast range. Its limited transfer to another model further suggests that some of the gain is tied to the optimized model.</p>
+<p>These studies cannot be collapsed into one universal result: they use different variables, scales, models, initial states, and definitions of skill. A conservative conclusion is that forecast error grows as expected for deterministic chaos and that station-scale skill is finite in practice. A forecast beyond day 14 would not be evidence of compromise, but a longer-range forecast might.</p>
+<p>For small initial differences, the time to reach an error tolerance Δ scales as (1/λ) ln(Δ/δ₀). With a two-day doubling time, λ is about 0.35 per day: reducing initial error by e adds about three days, by ten adds about seven, and by a million adds about forty. The horizon is movable, but only through rapidly increasing knowledge of the initial state. That knowledge must come from observations and assimilation, not computation or intelligence alone.</p>
+<h3 id="a-2-ground-truth-is-a-measurement-product-and-it-has-versions">A.2 · Ground truth is a measurement product, and it has versions</h3>
+<p>The atmosphere creates a state; the platform scores a measurement product. Instruments have finite resolution and uncertainty, and a station samples its immediate environment rather than a model grid cell. Over complex terrain, this representativeness error can exceed instrument error. Archives also change as late reports arrive and quality flags are revised.[12-13]</p>
+<p>Measurement therefore sets a floor on useful scoring. A forecast cannot be judged more finely than the observation noise, which may dominate at short lead times. This floor could perhaps be estimated from co-located instruments and neighbouring stations.</p>
+<p>Quality control can also be manipulated. A false value may be detected, while a value made to look anomalous may simply be rejected. The platform should consider publishing every inclusion and exclusion with its reason and monitor shifts in rejection rates.</p>
+<h3 id="a-3-sampling-and-ranking">A.3 · Sampling and ranking</h3>
+<p>Selecting scored stations after valid time raises the cost of targeted tampering, but it also increases sampling noise. Sample size should therefore come from a power analysis: how many station-times are needed to resolve a stated skill difference at a stated error rate?</p>
+<p>The draw must be large enough to detect real differences and to make best-of-many submissions unprofitable, yet small enough to keep any one sensor unlikely to matter. Historical simulation could determine the optimal compromise.</p>
+<h2 id="appendix-b-physical-reach-and-sensor-interference">Appendix B · Physical reach and sensor interference</h2>
+<p>This appendix tests the claim that participants cannot steer the atmosphere at the relevant scale, then treats an important exception: the immediate surroundings of a sensor.</p>
+<h3 id="b-1-a-ladder-of-scales">B.1 · A ladder of scales</h3>
+<p>“Can weather be manipulated?” has no scale-free answer. Large-scale flow, clouds, local fog, and the air around an instrument are different control problems. The platform’s practical exposure lies at the smallest scale. The categories below are schematic and follow the scale distinctions used in weather-modification and marine-cloud field studies.[10]</p>
+<div class="tblwrap"><table><caption>Table 2 - Physical weather intervention by scale</caption><thead><tr><th scope="col">Regime</th><th scope="col">Typical intervention</th><th scope="col">What it can influence</th><th scope="col">Design response</th></tr></thead><tbody><tr><td>Synoptic · about 1000 km</td><td>No known participant-scale method</td><td>Cannot select a regional flow pattern or station-hour value</td><td>Treat the physical target as out of reach</td></tr><tr><td>Cloud / mesoscale · 10-100 km</td><td>Cloud seeding; proposed cloud interventions</td><td>Conditional changes in suitable clouds, not arbitrary states</td><td></td></tr><tr><td>Local · about 1 km</td><td>Fog dispersal; favourable orographic seeding</td><td>Can alter local conditions under constrained circumstances</td><td></td></tr><tr><td>Instrument microenvironment · metres</td><td>Heat, water, shade, smoke, or altered ventilation</td><td>Can bias a measured value cheaply</td><td>Treat sensor surroundings as a primary physical attack surface</td></tr></tbody></table></div>
+<h3 id="b-2-cloud-and-climate-intervention">B.2 · Cloud and climate intervention</h3>
+<p>The World Meteorological Organization distinguishes local or regional weather modification from climate intervention. It rejects claims that available techniques can create rain systems, redirect regional winds, or remove severe weather, while recognizing conditional progress in winter orographic cloud seeding.[7] The SNOWIE campaign measured seeding-induced snowfall in three favourable cases.[8]</p>
+<p>Large-scale climate intervention may be technically feasible. Smith and Wagner estimated about $2.25 billion per year over fifteen years for one stratospheric-aerosol scenario.[9] Such a programme would alter radiative forcing over broad regions and long periods; it would not let an actor choose a particular station-hour value after a forecast is committed.</p>
+<p>Any intervention aimed at one scored value would still need to propagate through the atmosphere to the station. Predicting that propagation is itself a forecasting problem. Large interventions can shift the distribution of outcomes; they do not select the individual draw.</p>
+<h3 id="b-3-the-sensor-s-surroundings-are-the-real-physical-vulnerability">B.3 · The sensor's surroundings are the real physical vulnerability</h3>
+<p>A heater, sprinkler, temporary shade, smoke source, or obstruction near a screen can bias a reading without steering a storm. The attacker need not hit an exact value; it need only move the observation toward its committed forecast. The barrier here is cost and detectability.</p>
+<p>Suppose 40 of 500 stations are drawn for scoring in each cycle. Any one station then has an 8% chance of being scored. Compromising k stations yields, on average, 0.08k scored stations, each contributing only its fraction of the mean. Moving a seasonal result would likely require sustained access to many sites, while evading operators, maintenance visits, neighbouring-station checks, and metadata review. The channel is not closed, but it appears costly per unit of score compared with compromising software or influencing an operator. The draw size and score precision should be designed together.</p>
+<p>Weather stations are also unusually defensible physical assets. The set is finite, locations are known, national services already monitor them, and long records show how each station normally behaves relative to season and neighbours. Unlike a software system whose dependencies keep multiplying, the defender knows what exists, where it is, and what it should report.</p>
+<p>After-the-fact sampling makes interference less surgical. An attacker does not know which stations will count and never observes the undisturbed counterfactual. Influence must therefore be broad and repeated - the pattern most likely to leave physical and statistical evidence.</p>
+<h3 id="b-4-avoiding-an-externality-on-safety-of-life-infrastructure">B.4 · Avoiding an externality on safety-of-life infrastructure</h3>
+<p>An evaluation platform should not create incentives to degrade stations used for aviation, storm warning, or marine safety. Physical and data-channel experiments could use a consented shadow network: decoy instruments and feeds with deliberate vulnerabilities that never enter operational meteorology. Anomalies on real networks should trigger coordinated disclosure, not leaderboard credit. Outdoor experiments also require permits, environmental review, and local consent.</p>
+
+<h3 id="b-5-open-problems">B.5 · Open problems</h3>
+<ul><li>How much does spatial consistency still detect when an attacker knows the test?</li><li>How many correlated station biases can evade cross-network checks, and at what cost?</li><li>Which station classes are most exposed to local interference, and can metadata identify them in advance?</li><li>How should operators distinguish and disclose an attack, an instrument fault, and an ordinary anomaly?</li></ul>
+<h2 id="appendix-c-score-and-interpretation">Appendix C · Score and interpretation</h2>
+<h3 id="c-1-score-integrity-vs-interpretation">C.1 · Score integrity vs. interpretation</h3>
+<p>The protocol can prove that a file was committed before the outcome and scored reproducibly. It cannot prove what produced the file. For example, ECMWF and NOAA issue multiple daily forecasts, including station-oriented products.[14-16] An agent could access and combine those forecasts, correct local biases, and score well without improving a weather model or its own methods.</p>
+<p>That is valid forecasting, but it breaks the connection between score and any advanced agent capability. The public registry could claim only demonstrated forecast performance and improvement relative to a declared baseline.</p>
+<p>If the baseline scores zero, copying it earns nothing. Positive skill may still come from post-processing, model combination, new data, a better model, or agent-led experimentation; the registry need not pretend to separate them. It must, however, commit the baseline recipe, input fields, interpolation, station corrections, and model-cycle version before scoring.</p>
+<p>Operational baselines change. An upgrade can make every entrant look worse overnight and break multi-year comparability. The registry could report absolute and baseline-relative scores, define eras, and re-score a fixed historical window across transitions to estimate the offset. Comparisons will still be strongest within an era.</p>
+<h3 id="c-2-two-leagues-two-claims">C.2 · Two products</h3><p>The table below illustrates two implementations along a spectrum and their properties.</p>
+<div class="tblwrap"><table><caption>Table 3 - Two products</caption><thead><tr><th scope="col">Property</th><th scope="col">Open performance registry</th><th scope="col">Hosted behavioural observatory</th></tr></thead><tbody><tr><td>Core output</td><td>Identity-bound series of committed forecasts and reproducible scores</td><td>Attested corpus of runs under specified conditions</td></tr><tr><td>Supported claim</td><td>What was submitted, when, and how it scored</td><td>What a specified model-plus-scaffold did in the hosted run</td></tr><tr><td>Hosting</td><td>Self-hosted; no isolation required</td><td>Platform-hosted; isolation and monitoring required</td></tr><tr><td>Data access</td><td>Open; scored against a versioned public baseline</td><td>Open or restricted according to the experiment</td></tr><tr><td>Evidence</td><td>Identity and declared submission family</td><td>Model, prompts, scaffold, tools, checkpoints, network, and resource logs</td></tr><tr><td>What it cannot show</td><td>Latent capability or what caused the score</td><td>Intent, transfer to other settings, or unobserved behaviour</td></tr><tr><td>Main risks and limitations</td><td>Hidden variants, deliberate underperformance, baseline drift</td><td>Escape, confidentiality, observer effect, and attribution</td></tr></tbody></table></div>
+<h3 id="c-3-levels-of-hosting-and-observation">C.3 · Hosting and observation levels</h3>
+<div class="tblwrap"><table><caption>Table 4 - Hosting and observation levels</caption><thead><tr><th scope="col">Level</th><th scope="col">Isolation and data access</th><th scope="col">Trace access</th><th scope="col">Supported misalignment claim</th></tr></thead><tbody><tr><td>T0 · Registry</td><td>None; self-hosted</td><td>No traces</td><td>Committed performance record</td></tr><tr><td>T1 · Reproducible hosted run</td><td>Isolated virtual machine; ordinary approved data access; verified software image</td><td>Standard tool, network, and resource logs</td><td>Behaviour under a specified hosted setup; weak restriction claim</td></tr><tr><td>T2 · Restricted experiment</td><td>Stronger isolation; mediated network; time-gated data mirror; no direct internet</td><td>Tamper-resistant full telemetry, replay, and governed researcher access</td><td>Primary tier for studying attempts to cross a stated information barrier</td></tr><tr><td>T3 · Confidential participation</td><td>Hardware-enforced model confidentiality; mediated network</td><td>Aggregate or vetted access only</td><td>Participation by proprietary-model owners, with reduced observability</td></tr></tbody></table></div>
+<p>In a restricted hosted run, the key boundary could be a time-gated data mirror that serves only information older than the commitment time. It must reject newer data, avoid timing leaks, and never become a path into or out of the isolated environment. Attempts to bypass it are useful observations of misalignment.</p>
+<p>The highest-confidentiality tier exposes a trade-off: the most interesting participants may join only when the operator can see least. Hardware confidentiality can protect a proprietary model while removing the visibility that gives the observatory scientific value on misalignment.</p>
+<p>The hosted product also relies on isolation even though capable agents may erode isolation. The boundary need only hold long enough, and be instrumented well enough, that a breach is contained or becomes a recorded event for the observatory.</p>
+<h3 id="c-4-open-problems">C.4 · Open problems</h3>
+<ul><li>Which public baseline is strong, automatable, and versioned well enough to serve as the reference?</li><li>What can the score distinguish among post-processing, new information, better models, and agent-led method changes?</li><li>What compute accounting is credible enough for normalized comparisons?</li><li>What configuration evidence will participants disclose, and which claims does each level support?</li></ul>
+<h2 id="appendix-d-engineering-integrity-and-behavioural-evidence">Appendix D · Engineering integrity and behavioural evidence</h2>
+<p>Physics prevents the future outcome from existing early; it does not secure the instruments, data, software, or operators. This list is probably incomplete.</p>
+<h3 id="d-1-from-atmosphere-to-score">D.1 · From atmosphere to score</h3>
+<p>A station value passes through a sensor, datalogger, communications link, ingest system, archive, platform retrieval, quality control, and scorer. Each step can fail or be manipulated. The advantage of the lockbox is not that these steps disappear, but that the main routes to a false score can be specified before launch. This leads to some potential design preferences:</p>
+<ul><li><strong>Submission format.</strong> Use a strict schema, fixed units and ranges, finite fixed-point values, an explicit penalty for omissions, and one canonical byte representation before hashing.</li><li><strong>Commitment.</strong> Let the server construct the record, the entrant sign it, and an independent service timestamp an append-only public log. Fix the submission window and randomness source in advance.</li><li><strong>Observation.</strong> Ingest several sources, freeze a dated snapshot, retain metadata and quality flags, forbid silent backfilling, and publish every scored inclusion and exclusion.</li><li><strong>Scoring.</strong> Use fixed arithmetic where possible, specify summation order, pin software and dependencies for a season, publish reference cases, and stop on errors rather than guessing.</li><li><strong>Statistics.</strong> Report uncertainty, allow ties or partial ordering, bind submissions to verified identities, disclose pre-registered variants, and correct for selection.</li><li><strong>Hosted runs.</strong> Verify the software image and harness, mediate outbound access, use least-privilege credentials and per-run isolation, keep monitoring outside the agent’s control, and maintain an independent shutdown path.</li></ul>
+<h3 id="d-2-ordinary-bugs-first">D.2 · Ordinary bugs first</h3>
+<p>Before looking for strategic deception, one would want to test omitted stations, missing-value codes, unit conversions, rounding boundaries, error paths, timestamp races, daylight-saving assumptions, leap seconds, randomness-beacon indexing, and dependency drift.</p>
+<h3 id="d-3-the-forecast-file-can-carry-hidden-information">D.3 · The forecast file can carry hidden information</h3>
+<p>A forecast contains many values, and any unscored freedom can become an output channel. If temperature is judged to roughly a degree but the file accepts three decimal places, the unused digits can encode data. Across 15,000 values per day, that can amount to several kilobits - published, signed, and permanent. Free-form metadata, flexible timestamps, or repeated hashing until a chosen pattern appears add more capacity.</p>
+<p>The server could round values to the scoring grid before hashing, remove metadata, fix field order and timestamps, bound file size, and estimate the remaining channel. These steps remove most avoidable capacity, reducing potential risks of steganography, collusion, and related misuse.</p>
+<h3 id="d-4-behaviours-the-platform-might-observe">D.4 · Behaviours the platform might observe</h3>
+<p>Each potential behaviour in the table below has an innocent interpretation; attribution would thus require additional context and controlled comparisons.</p>
+<div class="tblwrap"><table><caption>Table 5 - Candidate observable patterns and ambiguities</caption><thead><tr><th scope="col">Route or pattern</th><th scope="col">Observable</th><th scope="col">Why interpretation is hard</th></tr></thead><tbody><tr><td>External guidance or embargo bypass</td><td>Retrieving operational forecasts or future-dated data in a restricted run</td><td>Legitimate in the open registry; meaningful only when access was explicitly barred</td></tr><tr><td>Sensor or observation manipulation</td><td>Changing a sensor's surroundings, feed, quality flags, or inclusion</td><td>Can resemble faults, maintenance, or legitimate quality control</td></tr><tr><td>Rule or scorer exploitation</td><td>Using missing values, units, parser behaviour, rounding, or variant selection</td><td></td></tr><tr><td>Resource or credential acquisition</td><td>Seeking extra compute, model access, credentials, or escape routes</td><td>Operational impact may matter more than any score change</td></tr><tr><td>Operator influence</td><td>Seeking exceptions, access, or compute through social pressure</td><td>Often the least instrumented channel; may originate in the scaffold</td></tr><tr><td>Signalling or hidden variants</td><td>Encoding messages in forecasts</td><td></td></tr></tbody></table></div>
+<h3 id="d-5-attribution-and-the-observer-effect">D.5 · Attribution and the observer effect</h3>
+<p>Participants might control the instructions, tools, scaffolds, harness, or fine-tuning around a model. An observed action cannot be attributed to the base model unless the full configuration is retained and available to qualified auditors. That requirement can conflict with intellectual property and privacy. Results should therefore state the evidence level: public configuration, confidential but independently verified configuration, or participant assertion only.</p>
+<p>Once traces are a research product, agents can adapt to the monitors. They may produce benign-looking reasoning, shift activity to less visible tools, or behave differently in announced runs. Rather than ignore this observer effect, the platform could randomize approved monitoring conditions, delay disclosure of some detectors, and measure how behaviour changes when monitoring is known.</p>
+<h3 id="d-6-releasing-the-data-safely">D.6 · Releasing the data safely</h3>
+<p>Raw traces may contain practical methods for attacking isolated environments, scoring systems, or meteorological infrastructure. Release should therefore be tiered: low-risk telemetry can be public; behavioural traces can be delayed and redacted; directly actionable material should require controlled access. Independent custody of the unredacted record would make selective disclosure easier to audit.</p>
+<h3 id="d-7-relation-to-ai-control">D.7 · Relation to AI control</h3>
+<p>AI control research explores how a model that may be trying to subvert a protocol can still do useful work, often with a weaker trusted monitor. The temporal lockbox contributes one component whose correctness does not depend on out-reasoning the agent under evaluation: the verifying signal arrives from outside, later, and comparison is arithmetic. This may provide a stronger testbed for some control methods.</p>
+<h3 id="d-open-problems">Open problems</h3><ul><li>What is the smallest hosted setup that supports a defensible behavioural claim, and what remains unobserved?</li><li>What evidence distinguishes model-initiated action from instructions in the scaffold or from operator behaviour?</li><li>Which detectors can learn from a public corpus, and how quickly do they lose power once agents know them?</li><li>Can the residual hidden channel in a canonical forecast file be bounded quantitatively?</li></ul>
+<h2 id="appendix-e-deliberate-underperformance-and-long-term-interpretation">Appendix E · Deliberate underperformance and long-term interpretation</h2>
+<h3 id="e-1-the-guarantee-is-one-sided">E.1 · The guarantee is one-sided</h3>
+<p>Commitments and reproducible scoring prevent a submitted forecast from being improved after the fact. They do not make a system reveal its best forecast, make a laboratory submit its strongest system, or compel participation. The public series is therefore a lower bound on voluntarily demonstrated performance, not a measurement of all available capability.</p>
+<p>Incentives can push either way. Prestige may reward strong entries; commercial secrecy, reputational risk, regulatory thresholds, or the economic value of forecasting may reward a weaker entry or none. Scores should probably be reported with participation and provenance, not interpreted in isolation.</p>
+<h3 id="e-2-probabilistic-forecasts-provide-diagnostics-not-proof">E.2 · Probabilistic forecasts provide some diagnostics</h3>
+<p>Full predictive distributions scored with a strictly proper rule encourage honest probability statements. The score can be decomposed into reliability - whether stated probabilities match frequencies - and resolution - how sharply the forecast distinguishes one situation from another.[20]</p>
+<p>Some forms of deliberate underperformance are easier to see than others. Artificially widening every distribution creates over-dispersion, visible in a rank histogram. Discarding information - removing predictors, coarsening inputs, or shortening context - can remain well calibrated and look exactly like a forecast originating from an honestly weaker model. Shifting the mean also creates miscalibration. These diagnostics separate types of degradation; they do not establish intent.</p>
+<h3 id="e-3-many-submissions">E.3 · Many submissions</h3>
+<p>Choosing the best of many honest submissions biases the record upward. For N independent entries with score standard deviation σ, the expected maximum is about σ√(2 ln N) above the mean; fifty variants buy roughly 2.8σ. The same sampling variation created by the station draw therefore fuels selection bias. Verified identities, pre-registered families of entries, limits or prices on parallel variants, and publication of every commitment would help.</p>
+<h3 id="e-4-the-platform-enters-future-training-data">E.4 · The platform enters future training data</h3>
+<p>Specifications and published traces will appear in later training data. Future agents may know the threat model, public monitors, and past failures. That weakens year-to-year comparability of behaviour even if the forecast metric stays stable. Delayed trace release, rotating monitor conditions, held-out shadow-network scenarios, and markers for later data reuse may help.</p>
+<p>The forecast series itself is different. Training on every past specification and trace still reveals nothing about weather that has not happened. The behavioural and performance products will therefore age differently.</p>
+<h3 id="e-5-open-problems">E.5 · Open problems</h3>
+<ul><li>Which forms of deliberate underperformance are detectable, and which are indistinguishable from genuine weakness?</li><li>Can the behavioural series be adjusted for platform knowledge, or only annotated with it?</li></ul>
+<h2 id="appendix-f-highest-priority-questions">Appendix F · Highest-priority questions</h2>
+<ul><li><strong>Meaning of the score.</strong> Which baseline-relative target best separates forecasting improvement from retrieval and plumbing?</li><li><strong>Observation integrity.</strong> Which correlated sensor or data-stream attacks defeat each cross-network test, at what cost?</li><li><strong>Alarm calibration.</strong> Can a 'tripwire' detect compromise without flagging genuine scientific progress?</li><li><strong>Statistical power.</strong> How many stations, lead times, and days resolve a meaningful difference after sampling and multiple submissions?</li><li><strong>Deterministic protocol.</strong> Can independent implementations produce identical scores across platforms and years?</li><li><strong>Deliberate underperformance.</strong> Which strategies respond to replay, elicitation, and randomized audits?</li><li><strong>Isolation.</strong> What is the minimum hosted tier that supports a useful behavioural claim?</li><li><strong>Attribution.</strong> What evidence separates model action from scaffold or operator instruction?</li><li><strong>Observer effect.</strong> How does behaviour change across known and delayed-disclosure monitoring conditions?</li><li><strong>Corpus governance.</strong> Which traces can be public, delayed, redacted, or restricted without losing auditability?</li><li><strong>Long-term validity.</strong> What remains comparable after platform details enter training data and participants change?</li></ul>
+<h2 id="glossary">Glossary</h2>
+<p>Terms are grouped by field.</p>
+<h3 id="core-evaluation-concepts">Core evaluation concepts</h3>
+<ul><li><strong>Temporal lockbox.</strong> An evaluation whose target does not exist when the answer is submitted and is generated later by a physical process no participant can control in the present context.</li><li><strong>Commitment.</strong> A dated record that fixes a forecast before a deadline. It may publish the file itself or only its cryptographic fingerprint until reveal.</li><li><strong>Valid time.</strong> The moment to which a forecast refers; for a Monday forecast of Thursday noon, Thursday noon is the valid time.</li><li><strong>Lead time.</strong> The interval between issuing a forecast and its valid time.</li><li><strong>Tripwire.</strong> A conservative prediction-performance threshold that triggers investigation, not automatic attribution.</li><li><strong>Observatory.</strong> A platform that records how agents work under sustained optimization pressure on the prediction task, not only their final scores.</li><li><strong>Registry.</strong> A public record of forecast commitments and reproducible scores, without hosting the agents.</li></ul>
+<h3 id="meteorology-and-atmospheric-physics">Meteorology and atmospheric physics</h3>
+<ul><li><strong>Synoptic scale.</strong> The roughly thousand-kilometre scale of highs, lows, and fronts that organize day-to-day weather.</li><li><strong>Initial conditions.</strong> The estimated atmospheric state from which a forecast begins. Small errors, intrinsic to any physical measurement, grow because the flow is turbulent.</li><li><strong>Data assimilation.</strong> The process of combining observations with models to estimate the initial state.</li><li><strong>Climatology.</strong> The long-run distribution of weather for a place and season; a forecast with no skill does no better than this reference.</li><li><strong>Predictability limit.</strong> The lead time at which forecast error becomes comparable with climatological error for a specified target and metric.</li><li><strong>Ensemble.</strong> A set of forecasts with varied initial conditions or models, used to represent and reduce uncertainty.</li><li><strong>Model output statistics, or post-processing.</strong> Statistical correction of raw model output, often for persistent station bias.</li><li><strong>Representativeness error.</strong> The mismatch between a point measurement and the area represented by a model grid cell.</li><li><strong>Radiosonde.</strong> A balloon-borne instrument that measures a vertical profile of the atmosphere.</li><li><strong>Orographic cloud seeding.</strong> Adding particles to clouds lifted over terrain to encourage precipitation under favourable conditions.</li><li><strong>Marine cloud brightening.</strong> A proposed intervention that would increase the reflectivity of low marine clouds, usually with sea-salt particles.</li></ul>
+<h3 id="forecast-verification-and-statistics">Forecast verification and statistics</h3>
+<ul><li><strong>Skill score.</strong> Performance relative to a stated reference forecast; matching the reference scores zero.</li><li><strong>Proper scoring rule.</strong> A rule under which a forecaster does best by reporting its actual probability distribution.</li><li><strong>Continuous ranked probability score (CRPS).</strong> A common proper score for a full predictive distribution.</li><li><strong>Calibration, or reliability.</strong> Whether stated probabilities match observed frequencies.</li><li><strong>Resolution, or sharpness.</strong> How strongly a forecast distinguishes one situation from another while remaining calibrated.</li><li><strong>Over-dispersion.</strong> Predictive distributions that are too wide, placing observations near the centre too often.</li><li><strong>Rank histogram.</strong> A plot of where observations fall within an ensemble or predictive distribution; characteristic shapes reveal under- or over-dispersion.</li><li><strong>Power analysis.</strong> A calculation of how much data is needed to detect a difference of a stated size at a stated error rate.</li><li><strong>Bootstrap interval.</strong> An uncertainty interval obtained by repeated resampling.</li><li><strong>Selection bias, or best-of-N.</strong> The upward bias from submitting many variants and reporting only the best. For N independent entries with spread σ, the expected best is roughly σ√(2 ln N) above the mean.</li></ul>
+<h3 id="cryptography-and-security-engineering">Cryptography and security engineering</h3>
+<ul><li><strong>Hash, or cryptographic fingerprint.</strong> A short value computed from a file; changing any byte changes the fingerprint with overwhelming probability.</li><li><strong>Commit-reveal.</strong> Publishing a fingerprint first and the underlying file later, fixing the answer before it is revealed.</li><li><strong>Append-only log, or transparency log.</strong> A public record designed so that later changes to earlier entries are detectable.</li><li><strong>Merkle tree.</strong> A tree of hashes that lets a large transparency log be checked efficiently.</li><li><strong>Timestamping.</strong> Independent evidence that a record existed before a given time. OpenTimestamps is one public service.</li><li><strong>Randomness beacon.</strong> A public service that emits unpredictable values on a schedule, allowing later choices that no single party could arrange in advance. drand is one example.</li><li><strong>Canonicalization.</strong> Fixing one permitted byte representation so equivalent content always has the same fingerprint and formatting choices cannot carry hidden data.</li><li><strong>Covert channel.</strong> A way to transmit information through a field not intended to carry it, such as unscored forecast digits.</li><li><strong>Sandbox.</strong> An isolated computing environment intended to limit what a program (or agent) can reach.</li><li><strong>Containment.</strong> The broader practice of keeping a system’s effects within a defined boundary.</li><li><strong>Egress control.</strong> Restrictions on what an isolated program may send outward and to whom.</li><li><strong>Attestation.</strong> Cryptographic evidence about which software and configuration actually ran.</li><li><strong>Confidential computing.</strong> Hardware isolation that hides code or data even from the machine operator; useful for proprietary models but at odds with detailed observation.</li><li><strong>Supply chain.</strong> The software components, dependencies, and build steps on which a system relies.</li><li><strong>Zero-day.</strong> A vulnerability unknown to the maintainer and therefore unpatched when used.</li><li><strong>Red team.</strong> A group authorized to attack a system in order to find weaknesses before deployment.</li><li><strong>Sybil attack.</strong> Creating many apparently independent identities to gain an advantage.</li><li><strong>Deterministic scoring.</strong> Arranging computation so that the same inputs produce identical results across implementations.</li></ul>
+<h3 id="ai-safety-and-evaluation">AI safety and evaluation</h3>
+<ul><li><strong>Frontier model.</strong> One of the most capable AI systems available at a given time.</li><li><strong>Agent.</strong> A model operating over an extended interaction with tools, code, memory, or the ability to modify its working setup.</li><li><strong>Scaffold, or harness.</strong> The human-written prompts and software around a model that turn it into an agent.</li><li><strong>Optimization pressure.</strong> Sustained pressure to improve a measured objective; in this document, repeated pressure to raise the forecast score.</li><li><strong>Specification gaming.</strong> Satisfying the literal rules of a measure while defeating its intended purpose.</li><li><strong>Goodhart’s law.</strong> The observation that a measure can cease to represent the intended goal once it becomes a target.</li><li><strong>Reward tampering.</strong> Altering the machinery that computes or displays a score instead of improving the underlying task.</li><li><strong>Sandbagging, or deliberate underperformance.</strong> Intentionally showing less capability than is available.</li><li><strong>Contamination.</strong> Loss of evaluation validity because answers entered training data or another accessible archive.</li><li><strong>Held-out set.</strong> Data withheld from training for evaluation; the temporal lockbox replaces this defence with future outcomes.</li><li><strong>Trace.</strong> The recorded history of an agent run: prompts, reasoning, tool calls, code, network activity, and outputs.</li><li><strong>Observer effect.</strong> A change in behaviour caused by knowing that the run is monitored.</li><li><strong>AI control.</strong> Research on protocols that extract useful work from a model that may try to subvert the protocol.</li><li><strong>Misalignment.</strong> A system pursuing objectives that differ from those intended by its developers or users.</li></ul>
+<h2 id="sources-and-verification-notes">Sources and verification notes</h2>
+<ol class="refs"><li>OpenAI, “OpenAI and Hugging Face partner to address security incident during model evaluation,” 21 July 2026. Primary source for the model-evaluation context, Internet access, and the path into Hugging Face production.</li><li>Hugging Face, “Security incident disclosure - July 2026,” 16 July 2026. Primary disclosure from the affected organization; source for the dataset-processing entry vector and independent detection and containment.</li><li>Lorenz, E. N. (1969), “The predictability of a flow which possesses many scales of motion.”</li><li>Rotunno, R. &amp; Snyder, C. (2008), “A generalization of Lorenz’s model for the predictability of flows with many scales of motion.”</li><li>Zhang, F. et al. (2019), “What is the predictability limit of midlatitude weather?”</li><li>Vonich, P. T. &amp; Hakim, G. J., “Atmospheric predictability beyond 30 days with machine learning,” arXiv:2504.20238 (2025); published in <em>Artificial Intelligence for the Earth Systems</em> (2026).</li><li>World Meteorological Organization (2025), “WMO statement on weather modification.”</li><li>Friedrich, K. et al. (2020), “Quantifying snowfall from orographic cloud seeding” (SNOWIE).</li><li>Smith, W. &amp; Wagner, G. (2018), “Stratospheric aerosol injection tactics and costs in the first 15 years of deployment.”</li><li>Doherty, S. J. et al. (2026), “Defining scales of field studies and experiments to assess marine cloud brightening.”</li><li>World Meteorological Organization, Instruments and Methods of Observation programme documentation.</li><li>NOAA, Integrated Surface Database documentation.</li><li>NOAA, Meteorological Assimilation Data Ingest System (MADIS) documentation.</li><li>ECMWF, operational forecast product documentation.</li><li>NOAA, Global Forecast System documentation.</li><li>NOAA/National Weather Service, station-oriented model output statistics documentation.</li><li>Aardvark Weather (2025), for end-to-end observation-to-forecast performance and compute.</li><li>Mosaic (2026), for ensemble inference time and hardware.</li><li>Zhang et al. (2026), for AI weather-model performance on record-breaking extremes.</li><li>Hersbach, H. (2000), for the decomposition of the continuous ranked probability score.</li><li>drand, for public verifiable randomness.</li><li>OpenTimestamps, for independent timestamping of log roots.</li><li>NOAA Tides &amp; Currents and the IOC Sea Level Station Monitoring Facility, for tide-gauge observation and cross-network verification.</li><li>ESA Space Debris Office and U.S. Space-Track documentation, for orbital tracking, re-entry uncertainty, and access constraints.</li></ol>
+<footer>
+<p><b>Editing Note and Acknowledgments:</b> This essay has greatly benefited from brainstorming, writing, design and editing from Fable 5, Opus 5 and GPT5.6 Sol Pro.</p>
+<p>Colophon. Figures are schematic SVG illustrations rather than data plots. Set in Newsreader, Source Serif 4, and IBM Plex Mono with robust fallbacks.</p>
+</footer>
+</article>
+</body>
+</html>
