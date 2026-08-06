@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Experiments in AI-Assisted Research: Physics &amp; AI Safety.">
+  <title>Experiments in AI-Assisted Research: Physics &amp; AI Safety</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #fafaf7;
+      --ink: #1c232b;
+      --ink-soft: #535e68;
+      --accent: #1d5a6e;
+      --accent-deep: #123b4a;
+      --rule: #dce0dd;
+      --band: #e7eff0;
+      --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+      --display: "Newsreader", Georgia, serif;
+      --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 1.075rem;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    a:hover { color: var(--accent-deep); }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .wrap { max-width: 44rem; margin: 0 auto; padding: 0 1.35rem; }
+
+    header { position: relative; overflow: hidden; border-bottom: 1px solid var(--rule); }
+    .contours {
+      position: absolute; inset: 0; pointer-events: none; opacity: .68;
+      background:
+        radial-gradient(78rem 15rem at 46% 118%, transparent 52%, rgba(29,90,110,.11) 52.2%, transparent 52.5%),
+        radial-gradient(65rem 13rem at 48% 111%, transparent 50%, rgba(29,90,110,.13) 50.25%, transparent 50.55%),
+        radial-gradient(52rem 11rem at 46% 105%, transparent 47%, rgba(29,90,110,.13) 47.3%, transparent 47.6%),
+        radial-gradient(39rem 9rem at 49% 98%, transparent 43%, rgba(29,90,110,.1) 43.35%, transparent 43.7%);
+    }
+    .head-inner { position: relative; padding: 4.5rem 0 2.6rem; }
+    .eyebrow,
+    .byline,
+    .version,
+    .meta,
+    .footnotes,
+    footer { font-family: var(--mono); }
+    .eyebrow {
+      color: var(--accent); font-size: .72rem; letter-spacing: .14em;
+      margin-bottom: 1.4rem; text-transform: uppercase;
+    }
+    h1, h2, h3 { font-family: var(--display); }
+    h1 {
+      font-size: clamp(2.35rem, 7vw, 3.15rem); font-weight: 500; letter-spacing: -.012em;
+      line-height: 1.12; max-width: 39rem;
+    }
+    .standfirst {
+      color: var(--ink-soft); font-family: var(--display); font-size: 1.28rem;
+      font-style: italic; line-height: 1.5; margin-top: 1.15rem; max-width: 37rem;
+    }
+    .byline { color: var(--ink-soft); font-size: .76rem; letter-spacing: .03em; margin-top: 1.7rem; }
+    .version { color: var(--accent); font-size: .72rem; letter-spacing: .06em; margin-top: .55rem; text-transform: uppercase; }
+
+    article { padding: 2.4rem 0 1rem; }
+    h2 {
+      font-size: 1.5rem; font-weight: 600; letter-spacing: -.008em; line-height: 1.25;
+      margin: 3rem 0 1rem;
+    }
+    h2::before { background: var(--accent); content: ""; display: block; height: 2px; margin-bottom: .85rem; width: 2.1rem; }
+    h3 { color: var(--accent-deep); font-size: 1.12rem; font-weight: 600; margin: 2rem 0 .6rem; }
+    p { margin: 0 0 1.15rem; }
+    ul { margin: 0 0 1.25rem 1.25rem; }
+    li { margin-bottom: .5rem; padding-left: .2rem; }
+    .lede { font-family: var(--display); font-size: 1.23rem; line-height: 1.55; }
+
+    .epistemic {
+      background: var(--band); border-left: 3px solid var(--accent); color: var(--ink);
+      font-size: .93rem; line-height: 1.62; margin: 0 0 2.2rem; padding: 1.05rem 1.2rem;
+    }
+    .epistemic p:last-child, .pull p:last-child { margin-bottom: 0; }
+    .pull {
+      border-bottom: 1px solid var(--rule); border-top: 1px solid var(--rule); color: var(--accent-deep);
+      font-family: var(--display); font-size: 1.32rem; font-style: italic; line-height: 1.45;
+      margin: 2.2rem 0; padding: 1.3rem .2rem;
+    }
+    .part {
+      border-top: 2px solid var(--accent); color: var(--accent-deep); font-family: var(--display);
+      font-size: 2rem; font-weight: 600; letter-spacing: -.01em; line-height: 1.2;
+      margin: 4.2rem 0 1.6rem; padding-top: 1.5rem;
+    }
+    .part + h2 { margin-top: 1.4rem; }
+
+    .source-list { margin-left: 1.35rem; }
+    .source-list li { margin-bottom: .7rem; padding-left: .25rem; }
+
+    .table-wrap { margin: 1.8rem 0 .5rem; overflow-x: auto; }
+    table { border-collapse: collapse; font-family: var(--mono); font-size: .74rem; line-height: 1.48; min-width: 37rem; width: 100%; }
+    caption { caption-side: top; color: var(--accent-deep); font-weight: 500; padding: .35rem 0 .55rem; text-align: left; }
+    th { border-bottom: 1.5px solid var(--ink); color: var(--ink-soft); font-size: .65rem; font-weight: 500; letter-spacing: .05em; padding: .5rem .55rem .45rem; text-align: left; text-transform: uppercase; }
+    td { border-bottom: 1px solid var(--rule); padding: .65rem .55rem; vertical-align: top; }
+    td:first-child { color: var(--ink); font-weight: 500; }
+    tr.candidate td { background: #edf4f4; }
+    .artifact {
+      border-top: 1px solid var(--rule); display: grid; gap: .4rem; grid-template-columns: 8rem 1fr;
+      padding: .85rem 0;
+    }
+    .artifact .meta { color: var(--accent); font-size: .7rem; letter-spacing: .08em; padding-top: .25rem; text-transform: uppercase; }
+    .artifact p { margin-bottom: 0; }
+    .placeholder { color: var(--ink-soft); font-style: italic; }
+    .footnotes { color: var(--ink-soft); font-size: .77rem; line-height: 1.6; margin: 2rem 0 0 1.15rem; }
+    .footnotes li { margin-bottom: .7rem; }
+    footer { border-top: 1px solid var(--rule); color: var(--ink-soft); font-size: .76rem; line-height: 1.7; margin-top: 3rem; padding: 1.6rem 0 3.2rem; }
+
+    @media (max-width: 600px) {
+      body { font-size: 1rem; }
+      .head-inner { padding-top: 3.2rem; }
+      .standfirst { font-size: 1.14rem; }
+      .part { font-size: 1.7rem; }
+      .artifact { grid-template-columns: 1fr; gap: .15rem; }
+    }
+    @media print {
+      body { background: #fff; font-size: 10.4pt; line-height: 1.48; }
+      .wrap { max-width: none; padding: 0; }
+      .head-inner { padding: 1.25in 0 .55in; }
+      article { padding-top: .35in; }
+      .part { break-before: page; page-break-before: always; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="contours" aria-hidden="true"></div>
+    <div class="wrap head-inner">
+      <p class="eyebrow">RESEARCH NOTEBOOK · AI-ASSISTED PHYSICS &amp; AI SAFETY</p>
+      <h1>Experiments in AI-Assisted Research: Physics &amp; AI Safety</h1>
+      <p class="standfirst">An exploratory account of using frontier AI systems to formulate, investigate, revise, and document problems in mathematical physics and AI safety.</p>
+      <p class="byline">Kristen Menou · Professor of Physics and Astrophysics, University of Toronto · kristen.menou@utoronto.ca</p>
+      <p class="version">V0.1 - August 6 2026</p>
+    </div>
+  </header>
+
+  <main>
+    <article class="wrap">
+      <h2 id="orientation">Orientation</h2>
+      <p class="lede">This page records experiments in which AI systems have been used as substantial contributors to mathematical problem solving in Physics and AI Safty. It describes a process and its early outputs, rather than claiming that the candidate results collected here are established science.</p>
+      <div class="epistemic"><p>Unless a result is explicitly marked as independently verified, every reported result on this page should be read as provisional. Candidate arguments, code, and supporting materials are shared so that they can be inspected, tested, criticized, or refuted.</p></div>
+
+      <h1 class="part" id="motivation">Motivation</h1>
+      <p>AI systems are becoming genuinely capable contributors to mathematical problem solving. Mathematics is a favorable domain: candidate claims can be stated precisely, and their correctness can, at least in principle, be checked through computation, or formalization. That makes it both a natural proving ground for AI-assisted research and an unusually tractable setting in which to evaluate it.</p>
+      <p>Looking beyond math, other sciences also have verifiable elements, but verification for them is typically slower, more distributed, and more ambiguous: it may depend on experiments, complex simulations, or even interpretive judgment. Whether the growing contribution of AI to mathematical progress can translate into meaningful contributions elsewhere — and what research methods might enable that translation — is an open question.</p>
+      <p>I have been exploring this question through problems in mathematical physics and AI safety (i.e. specific problems with a game-theoretic or complexity-theoretic core). Can a common AI-assisted workflow help formulate, address and resolve problems across these areas, and can current models already produce candidate results that merit serious investigation? In this context, failures may be as interesting as apparent successes.</p>
+      <p>This exploration has produced several candidate results that seem to motivate substantial follow-up, including one in kinetic theory that requires careful verification. At the moment, candidate results emerge faster than one can responsibly verify them. The limiting steps  involve reconstructing derivations, testing code, searching for prior art, and possibly finding reviewers with the right expertise across disciplines.</p>
+      <p>I am starting with two released candidate results — one in physics, one in game theory — together with an account of how they were produced, so that others can examine, test, criticize, or refute the work. Nothing published here from these experiments should be read as an established result (unless explicitly noted later on).</p>
+      <p class="pull">At this stage, the AI-assisted research process described and its consequences might be as informative and interesting as the individual candidate results themselves.</p>
+      <p>The Methods section below describes, in broad strokes, how I used AI systems to select problems, develop candidate arguments, cross-check and critique the generated artifacts, and finally revise what survived. It also describes where human judgment enters: selecting problems, steering the process, and deciding which outputs are worth pursuing. The Results section records the wider range of problem classes I have been exploring so far, distinguishing work still in progress from tentative candidate results and tasks that failed or proved unproductive.</p>
+      <p>Eventually, one could imagine a system such that every AI-assisted claim carry its own verification state, provenance record, review history, and explicit mechanisms for correction and credit. Something like that could, in principle, become a template for meaningfullypublishing AI-assisted research. What is shared here for now is more modest: an early account of a specific exploratory process, with a small number of provisional results and artifacts, published before any infrastructure for AI-assisted research even exists.</p>
+      <p>A broader question that motivates this project is: can AI-assisted research become useful to scientists beyond mathematicians, across various research dimensions (scope, breadth, depth and impact).   </p>
+      <p><strong>Acknowledgments:</strong>&nbsp;Much of this project has greatly benefited from brainstorming, writing and editing from Fable 5, Opus 5 and GPT5.6 Sol Pro.</p>
+
+      <h1 class="part" id="methods">Methods</h1>
+      <p>The following generic workflow was largely committed in advance. In broad outline, it has five stages:</p>
+      <ol class="source-list">
+        <li>Problem formulation — choosing definite questions whose answers are plausibly verifiable</li>
+        <li>Task construction — turning a chosen problem into a constrained long-horizon task formulation</li>
+        <li>Long-horizon search — looped agentic runs to explore competing approaches until resolved</li>
+        <li>Criticism and revision — leverage separate model criticism, fed back into search/refinement</li>
+        <li>Artifact preparation — reorganizing what survived into a readable writeup and auxiliary verification artifacts</li>
+      </ol>
+      <p>In practice, the stages can overlap, and the balance among them can vary from one problem to another, especially as a given project unfolds.</p>
+      <p>Several AI systems played distinct roles throughout:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ROLE</th><th>SYSTEMS</th></tr></thead>
+          <tbody>
+            <tr><td>Brainstorming</td><td>Fable 5</td></tr>
+            <tr><td>Cross-checks, writing, and editing</td><td>Opus 5, Fable 5, GPT‑5.6 Pro</td></tr>
+            <tr><td>Task Definition and Critical/Literature reviews</td><td>GPT‑5.6 Pro</td></tr>
+            <tr><td>Long-horizon exploration, execution and loops</td><td>GPT‑5.6 Terra and GPT‑5.6 Sol (Ultra mode)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="problem-formulation">1. Problem formulation</h2>
+      <p>Problem formulation came first, and it was kept separate from any attempted solution. I brainstormed with Claude Fable 5 about areas of mathematical physics, game theory, and complexity theory I know enough about to appreciate the potential significance of a result, even if I may not be able to review every research artifact myself.</p>
+      <p>I used the recent Fable-5-assisted counterexample to the Jacobian conjecture in 3D [1] as an elicitation step: it is an example artifact that Fable 5 could verify quickly and directly, before starting any brainstorming session on other domains where similarly verifiable artifacts might exist.</p>
+      <p>I narrowed and reformulated the resulting candidate problems through further discussion. This was an elicitation stage, not a reliable test of novelty: a problem suggested by a model may already have been answered, may be ill-posed, or may conceal assumptions that only become visible later. I chose the subfields and selected problems that seemed worth pursuing and within my technical grasp. Later examination of the literature sometimes changed the formulation, or the apparent significance of the target.</p>
+
+      <h2 id="task-construction">2. Task construction</h2>
+      <p>Once I had selected a problem, I turned it into a research task. The starting point was OpenAI's published prompt for the Cycle Double Cover Conjecture, which I asked GPT‑5.6 Pro to abstract into a generic template (with placeholders) for a verifiable task statement, admissible methods, success conditions, and failure conditions.[2] I then combined that generic template with the problem formulation developed at the previous stage. The point was not merely to replace the conjecture-specific vocabulary; I wanted to retain several features of the original prompt and methodology:</p>
+      <ul>
+        <li>a precise target</li>
+        <li>a strong distinction between a complete resolution and merely suggestive progress</li>
+        <li>a search across substantially different approaches and solution strategies</li>
+        <li>the aggressive use of multi-agents to broaden the search space and to leverage test-time compute more effectively</li>
+        <li>a demand for concrete lemmas, constructions, equations, or counterexamples</li>
+        <li>repeated adversarial attempts to break any proposed answer</li>
+      </ul>
+      <p>The resulting task was deliberately more forceful than an ordinary request for a "best effort." It asked the system to treat the task as a long-horizon goal, to avoid stopping after the first failed route, and to keep several regions of the strategy space alive long enough to learn why they worked or failed. </p>
+      <p>The generic task template and each problem-specific task statement were not fine-tuned in any way, in the spirit of broad and generalizable elicitation again. There is potentially considerable room for improvement in both steps.</p>
+
+      <h2 id="long-horizon-search">3. Long-horizon search</h2>
+      <p>I assigned the resulting tasks to Codex, using GPT‑5.6 Terra or GPT‑5.6 Sol in Ultra mode, depending on the problem and the compute budget. Ultra mode coordinates parallel subagents working on different parts of a task, or on different approaches to it.</p>
+      <p>An outer loop (/goal) towards successful resolution was further imposed, in the spirit of:</p>
+      <blockquote class="pull"><p>Do not stop until you have successfully completed the following task.</p></blockquote>
+      <p>The various problem runs lasted from several hours to several days. Some produced a candidate resolution within hours; others were stopped after days without any clear progress.</p>
+
+      <h2 id="criticism-and-revision">4. Criticism and revision</h2>
+      <p>Any promising output then entered a separate criticism phase. I used GPT‑5.6 Pro as the principal reviewer, in the spirit of:</p>
+      <blockquote class="pull"><p>Crtically review all the claims and artifacts associated with the following result.</p></blockquote>
+      <p>Occasionally Fable 5 (or Opus 5) provided additional reviews and cross-checks.</p>
+      <p>Some candidate results survived this critical review stage and were developed further (i.e. sent back to the agentic loop for revision). Others weakened into partial statements, stalled at a specific gap, or were abandoned.</p>
+
+      <h2 id="artifact-preparation">5. Artifact preparation</h2>
+      <p>The final stage was the preparation of the results for sharing. I reorganized candidate arguments, artifacts and code into academic-style writeups and associated research artifacts, with heavy assistance from Sol Pro, plus Fable 5 or Opus 5 for relevant literature cross-checks.</p>
+
+      <h2 id="scientist-in-the-loop">Scientist-in-the-loop</h2>
+      <p>My role was concentrated at the transitions between stages rather than distributed uniformly across every step of the process. I:</p>
+      <ul>
+        <li>selected the research areas, subdomains, and shaped and selected problem formulations of personal interest</li>
+        <li>chose the models and compute budgets</li>
+        <li>decided when to stop, redirect, or abandon an agentic run</li>
+        <li>interpreted the critiques and decided when/what to feed back</li>
+        <li>selected the outputs that appeared significant enough to pursue</li>
+      </ul>
+      <p>I did not independently reconstruct every derivation or verify every claim in the results and artifacts being released here, and as of this release no other person has examined these arguments in detail. The process is therefore neither fully autonomous research nor conventional human research with AI used only for drafting: the models did a substantial part of the search and exploration, derivation, coding, criticism, and exposition, while human judgment framed the tasks and curated what survived.</p>
+
+      <h1 class="part" id="results">Results</h1>
+      <p>The record below includes successes and failures (within a Test-Time-Compute budget of a few days at most). The status of several problems will likely evolve as candidate results are being reviewed over time or follow-up attempts (including with greater TTC budgets) are pursued. Additional problems may also be added over time.</p>
+
+      <h2 id="candidate-results">Candidate results and promising directions</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>PROJECT / PROBLEM</th><th>STATUS</th></tr></thead>
+          <tbody>
+            <tr class="candidate"><td><a href="https://github.com/kmenou/ai-research-hard-sphere-boltzmann-certified-enclosures" target="_blank" rel="noopener noreferrer">Bounds on hard-sphere transport</a></td><td>Released</td></tr>
+            <tr class="candidate"><td>A kinetic theory problem</td><td>Promising (under detailed review)</td></tr>
+            <tr class="candidate"><td>Black Hole magnetospheres</td><td>In-progress</td></tr>
+            <tr class="candidate"><td><a href="https://github.com/kmenou/ai-research-certified-randomized-oversight" target="_blank" rel="noopener noreferrer">Certified finite patrol games</a></td><td>Released</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="inconclusive">Inconclusive or unproductive investigations</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>PROJECT / PROBLEM</th><th>STATUS</th></tr></thead>
+          <tbody>
+            <tr><td>Smale 6th problem</td><td>Reached TTC limit (days)</td></tr>
+            <tr><td>Coagulation equation</td><td>Reached TTC limit (days)</td></tr>
+            <tr><td>Limits of hydrodynamics</td><td>Unsuccessful</td></tr>
+            <tr><td>A relativistic hydrodynamics problem</td><td>Unclear</td></tr>
+            <tr><td>Debate &amp; complexity theory I</td><td>Unclear</td></tr>
+            <tr><td>Debate &amp; complexity theory II</td><td>Unclear</td></tr>
+            <tr><td>Steganography</td><td>Unclear</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="initial-artifacts">Initial artifacts</h2>
+      <div class="artifact">
+        <div class="meta">Physics artifact</div>
+        <p><a href="https://github.com/kmenou/ai-research-hard-sphere-boltzmann-certified-enclosures" target="_blank" rel="noopener noreferrer">Spectral gap and transport coefficients for the three-dimensional hard-sphere Boltzmann operator: certified enclosures</a> · Released v0.1. Article, certificates, derivations, verification programs, tests, and reproducibility materials.</p>
+      </div>
+      <div class="artifact">
+        <div class="meta">Game-theory artifact</div>
+        <p><a href="https://github.com/kmenou/ai-research-certified-randomized-oversight" target="_blank" rel="noopener noreferrer">Certified Randomized Oversight for AI Control</a> · Released v0.1. Article, mathematical appendix, source material, tutorial certificate, verifier, and integrity records.</p>
+      </div>
+
+      <h2 id="footnotes">Footnotes</h2>
+      <ol class="footnotes">
+        <li><a href="https://x.com/__alpoge__/status/2079028340955197566" target="_blank" rel="noopener noreferrer">Levent Alpöge, original X post</a> (20 July 2026).</li>
+        <li><a href="https://cdn.openai.com/pdf/04d1d1e4-bc75-476a-97cf-49055cd98d31/cdc_prompt.pdf" target="_blank" rel="noopener noreferrer">OpenAI, “Prompt Used for ‘A Proof of the Cycle Double Cover Conjecture’”</a> (PDF, 9 July 2026).</li>
+      </ol>
+    </article>
+  </main>
+
+  <footer class="wrap">
+    <p>Research notebook · V0.1</p>
+  </footer>
+</body>
+</html>
